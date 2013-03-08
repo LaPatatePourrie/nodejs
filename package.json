@@ -2,7 +2,14 @@
   "name": "node-example",
   "version": "0.0.1",
   "dependencies": {
-    "express": "2.4.7"
+    "express": "2.4.7",
+    "socket.io": "*",
+    "jade": "*",
+    "fs": "*",
+    "fs.extra": "*",
+    "mongoose": "*",
+    "underscore": "*",
+    "uril": "*"
   },
   "engines": {
     "node": "0.8.x",
