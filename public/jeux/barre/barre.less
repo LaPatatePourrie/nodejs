@@ -1,0 +1,178 @@
+@import "../../css/main.less";
+
+#jeu .jeu {
+	
+	#barre {
+		.create {
+			.bouton_vert(30%);
+			&.inactive {
+				.linear-gradient(#e3e3e3, #d3d3d3);
+				.color(#eeeeee);
+				.border(#b5b5b5);
+				text-shadow:none;
+				box-shadow:none;
+			}
+		}
+		
+		.content {
+			.rooms {
+				width:30%;
+				.inline-block;
+				.radius(5px);
+				padding:10px;
+				margin:0 25px 0 0;
+				background:#e8e8e8;
+				border:1px solid #c9c9c9;
+				
+				.title {
+					margin:0 0 10px 0;
+					font-size:14px;
+					font-weight:bold;
+				}
+				.opened, .full {
+					margin-bottom:20px;
+					.content {
+						color:@font-grey;
+					}
+				}
+				
+				.room {
+					.pointer;
+					padding:5px;
+					margin-top:-1px;
+					.bold;
+					.radius(3px);
+					.linear-gradient(#fff, #e3e3e3);
+					.border(#9b9b9b);
+					.color(#414141);
+					
+					&.locked {
+						.linear-gradient(#f1f1f1, #f1f1f1);
+						.color(#b1b1b1);
+						.border(#bdbdbd);
+					}
+					&.myRoom {
+						.linear-gradient(#ffe8bf, #ffe8bf);
+					}
+					
+					span.infos {
+						.normal;
+						span { .hide; }
+						span.join { 
+							.color(#8f8f8f);
+						}
+						span.delete { 
+							.color(#dd9999);
+						}
+					}
+					span.players { 
+						.normal;
+						float:right;
+					}
+				}
+			}
+			.interface {
+				width:60%;
+				margin:0;
+				.inline-block;
+				
+				&.hidden { .invisible }
+				&.endGame {
+					.game {  }
+				}
+				&.disconnection {
+					.game { .hide; }
+					.settings { .hide; }
+				}
+				
+				.info {
+					margin:0 0 40px 0;
+					
+					.feedback, .settings {
+						.radius(5px);
+						padding:10px;
+						min-height:50px;
+					}
+					.settings {
+						width:45%;
+						background:#FDEFB9;
+						border:1px solid #afa87c;
+					}
+					.feedback {
+						width:45%;
+						float:right;
+						
+						&.victory {
+							background:#c2eebc;
+							border:1px solid #8abb83;
+						}
+						&.defeat {
+							background:#eec9bc;
+							border:1px solid #be9789;
+						}
+						&.error {
+							background:#eec9bc;
+							border:1px solid #be9789;
+						}
+					}
+				}
+				.game {
+					.barres {
+						.barre {
+							width:25px;
+							display:inline-block;
+							height:150px;
+							border-radius:1px;
+							
+							div {
+								float:left;
+								height:150px;
+							}
+							
+							&.over {
+								.full { background:#737373; }
+							}
+							.full {
+								background:#afafaf;
+								width:15px;
+							}
+							.empty {
+								width:10px;
+							}
+						}
+					}
+					.arrow {
+						background:url("./img/leftarrow.png") left no-repeat;
+						height:150px;
+						width:50%;
+						float:right;
+						.relative;
+						
+						div {
+							.absolute;
+							.hide;
+							top:40%;
+							left:150px;
+						}
+						
+						&.myTurn {
+							.show;
+							.myTurn { .visible; }
+							background:url("./img/leftarrow_green.png") left no-repeat;
+						}
+						&.notMyTurn {
+							.show;
+							.notMyTurn { .visible; }
+							background:url("./img/leftarrow_grey.png") left no-repeat;
+						}
+					}
+				}
+			}
+			.rules {
+				margin:20px 0 0 0;
+				.color(#949494);
+			}
+		}
+		
+	}
+}

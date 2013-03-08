@@ -1,0 +1,50 @@
+#pendu
+    h2
+        | Jeu du Pendu
+      #jeu
+        #word
+          .type.gris
+          .word
+          .loader
+            img(src='#{path}/img/ajax-loader.gif')
+        #keyboard
+          #feedback
+            span
+          .keyboard
+        #control
+          .bouton(href='#', onclick='game.restart();')
+            | Nouvelle partie
+          .control
+            .categorie
+              .titre Catégorie :
+              input#radio_cg(type='radio', value='cg', name='categorie', checked='checked')
+              label(for='radio_cg') Culture générale
+              br
+              input#radio_histoire(type='radio', value='histoire', name='categorie')
+              label(for='radio_histoire') Histoire
+              br
+              input#radio_cinema(type='radio', value='cinema', name='categorie')
+              label(for='radio_cinema') Cinéma
+              br
+              input#radio_musique(type='radio', value='musique', name='categorie')
+              label(for='radio_musique') Musique
+              br
+              input#radio_litterature(type='radio', value='litterature', name='categorie')
+              label(for='radio_litterature') Littérature
+              br
+            .difficulte
+              .titre Difficulté :
+              input#radio_facile(type='radio', value='facile', name='difficulte', checked='checked')
+              label(for='radio_facile') Facile
+              br
+              input#radio_intermediaire(type='radio', value='intermediaire', name='difficulte')
+              label(for='radio_intermediaire') Intermédiaire
+              br
+              input#radio_difficile(type='radio', value='difficile', name='difficulte')
+              label(for='radio_difficile') Difficile
+              br
+      #draw
+        .draw
+          img(src='')
+      #score
+        .score Votre score : 0/0

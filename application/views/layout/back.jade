@@ -1,0 +1,17 @@
+div#page.back
+
+	div#topbar!= partial('layout/topbar.jade')
+	
+	div.overlay.lamd
+		div.container
+	div.overlay.feedback
+	div.overlay.confirm
+		div.box
+			div.txt Voulez vous vaiment effectuer cette action debile du bron x ?
+			div.btns
+				div.btn.confirm 	Confirmer
+				div.btn.cancel 		Annuler
+	
+	div#menuLAMD!= partial('layout/menu_lamd.jade')
+	div#corps!= partial('../back/lamd.jade')
+		

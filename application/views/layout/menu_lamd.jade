@@ -1,0 +1,32 @@
+ul.lamd
+	- for ( c in main.tpl.modules._category ) {
+	
+		- category = main.tpl.modules._category[c]
+		li.category
+			| #{c}
+			
+		- for ( i=0; i<category.length; i++ ) {
+			- module = main.tpl.modules[category[i]]
+			
+			- if ( module.auth.main.actions.list )
+				ul(data-module = '#{module.name}')
+					li.module(
+						data-module = '#{module.name}'
+					) 
+						| #{module.title}
+						
+					- if ( module.views )
+						- for ( v=0; v<module.views.order.length; v++ ) {
+							- view = module.views.all[module.views.order[v]]
+							
+							- if ( module.auth[module.views.order[v]].actions.list )
+								li.view(
+									data-module  = '#{module.name}'
+									data-view    = '#{module.views.order[v]}'			
+								)
+									img.active(src='/public/img/icon/view.png')
+									img.hover(src='/public/img/icon/view_hover.png')
+									| #{view.title}
+						- }
+		- }
+	- }

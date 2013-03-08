@@ -1,0 +1,227 @@
+#jeu .jeu {
+	/********* OOCSS **********/
+	.bouton {
+		width:150px;
+		border:1px solid #999;
+		border-radius:20px;
+		background:-moz-linear-gradient(top, #dedede, #c1c1c1);
+		background:-webkit-linear-gradient(top, #dedede, #c1c1c1);
+		text-align:center;
+		padding:10px 0;
+		margin:0 0 5px 0;
+		font-weight:bold;
+		cursor:pointer;
+		position:relative;
+		top:auto;
+		left:auto;
+		display:inline-block;
+	}
+	.bouton p {
+		display:inline;
+	}
+	.bouton p span {
+		text-decoration:underline;
+	}
+	.bouton:hover {
+		background:-moz-linear-gradient(top, #e7e7e7, #cccccc);
+		background:-webkit-linear-gradient(top, #e7e7e7, #cccccc);
+	}
+	.bouton:active {
+		background:-moz-linear-gradient(top, #b9b9b9, #ababab);
+		background:-webkit-linear-gradient(top, #b9b9b9, #ababab);
+	}
+	.bouton img {
+		position:absolute;
+		top:5px;
+		left:8px;
+	}
+
+	.gris {
+		color:#9C9C9C;	
+	}
+		
+
+
+	/********* MAIN **********/
+
+	#pendu {
+		width:800px;
+		margin:0 auto;
+		padding:10px 0;
+	}
+		#jeu {
+			width:500px;	
+			float:left;
+		}
+		#draw, #score {
+			float:left;
+			padding:20px;
+			background:#f2f2f2;
+			border-radius:20px;
+			border:1px solid #c5c5c5;
+		}
+		#draw {
+			margin:0 0 0 30px;
+			width:228px;
+			height:260px;
+		}
+		#score {
+			margin:20px 0 0 30px;
+			width:228px;
+			height:80px;
+		}
+
+	#word {
+		text-align:center;	
+		margin:20px 0 0px 0;
+		height:100px;
+	}
+		#word .type {
+			margin:0 0 20px 0;
+		}
+		#word .word {
+			font-size:20px;
+			display:inline-block;
+			padding:10px 15px;
+			border-radius:10px;
+			-moz-transition-property: background;
+			-moz-transition-duration: 0.3s;
+			-webkit-transition-property: background;
+			-webkit-transition-duration: 0.3s;
+		}
+		#word .blank {
+			width:10px;
+			display: inline-block;
+		}
+		#word .loader {
+			display:none;
+		}
+		#word .wordFound {
+			background:#c3e8c5;
+		}
+		#word .wordNotFound {
+			background:#e8c7c3;
+		}
+
+
+	#feedback {
+		color:#9c9c9c;
+		height:40px;
+	}
+		#feedback .gameover, #feedback .success {
+			color:#333;
+			font-size:16px;
+		}
+		
+
+	#keyboard {
+			text-align:center;	
+	}	
+		
+		#keyboard .line {
+		}
+			#keyboard .letter {
+				border:1px solid #7b7b7b;
+				border-radius:10px;
+				background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+				background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+				text-align:center;
+				padding:8px 16px;
+				margin:0 2px 2px 0;
+				font-weight:bold;
+				cursor:pointer;
+				display:inline-block;	
+			}
+			#keyboard .active:hover {
+				background:#ffffff;
+			}
+			#keyboard .inactive {
+				background:#e4e4e4;
+				color:#acacac;
+				border:1px solid #b5b5b5;
+				cursor:default;
+			}
+			#keyboard .found, #keyboard .notFound {
+				cursor:default;
+				color:#242424;
+				border:1px solid #474747;
+			}
+			#keyboard .found {
+				background: -moz-linear-gradient(top, #8ce585 0%, #5ed056 50%, #69dc61 51%, #8ce585 100%);
+				background: -webkit-linear-gradient(top, #8ce585 0%, #5ed056 50%, #69dc61 51%, #8ce585 100%);
+			}
+			#keyboard .notFound {
+				background: -moz-linear-gradient(top, #f54848 0%, #d53b3b 50%, #e43c3c 51%, #f54848 100%);
+				background: -webkit-linear-gradient(top, #f54848 0%, #d53b3b 50%, #e43c3c 51%, #f54848 100%);
+			}
+
+	#control {
+		text-align:center;
+		margin:50px 0 0 0;
+	}
+		#control .control {
+			margin:15px 0 0 0;
+			text-align:left;
+			padding:20px 25px 30px 25px;
+			background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(243,243,243,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+			background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(243,243,243,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+			border:1px solid #a5a5a5;
+			border-radius:10px;
+			vertical-align:top;
+		}
+		#control label {
+			font-size:13px;
+		}
+		#control .titre {
+			font-weight:bold;
+			font-size:13px;
+			margin:0 0 5px 0;
+		}
+		#control .control .categorie {
+			display:inline-block;
+			margin:0 50px 0 0;
+			vertical-align:top;
+		}
+		#control .control .difficulte {
+			display:inline-block;
+			vertical-align:top;
+		}
+
+
+
+
+	/* CONSTANTE ************************/
+
+	p {
+		margin:10px 0;	
+	}
+	a {
+		color:#a82b00;
+		text-decoration:none;
+		font-weight:bold;
+	}
+	a:hover {
+		color:#540300;
+	}
+	ul {
+		list-style-type:none;	
+		padding:0;
+		margin:0;
+	}
+	h1 {
+		text-shadow:0px 0px 1px #ffffff;
+		font-size:40px;
+		margin:0;
+		border-bottom:1px solid #9f9f9f;
+		margin:0 0 10px 0;
+		padding:0 0 0 10px;
+	}
+	
+	input[type="radio"] {
+		height:auto;
+		width:auto;
+	}
+	label {
+		margin:0 0 0 8px;
+	}
+}
