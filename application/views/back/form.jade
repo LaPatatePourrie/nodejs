@@ -212,7 +212,6 @@
 												- val = v
 												- label = param.value.values[val]
 												
-												label
 													- checked = 'false'
 													
 													- if ( type == 'radio' )
@@ -235,14 +234,15 @@
 																	- checked = 'true'
 															- }
 													
-													input.case(
-														type			 = '#{type}'
-														value   		 = '#{val}'
-														name   			 = '#{f}'
-														data-checked	 = '#{checked}'
-														data-label		 = '#{label}'
-													)
-													| #{label}
+													label(data-checked = '#{checked}')
+														input.case(
+															type			 = '#{type}'
+															value   		 = '#{val}'
+															name   			 = '#{f}'
+															data-checked	 = '#{checked}'
+															data-label		 = '#{label}'
+														)
+														| #{label}
 											- }
 									
 								

@@ -71,8 +71,6 @@
 			- displayedValue = val
 			- if ( val ) 
 				- displayedValue = val.substr(0, field.display.maxLength )
-				- if ( val.length > field.display.maxLength ) 
-					- displayedValue = displayedValue + '...'
 			
 			
 			td.value(

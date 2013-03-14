@@ -354,7 +354,6 @@ function Upload (file) {
 				
 				self.fileLine.$file.find('td.title').attr('title', self.file.name);
 				self.fileLine.$file.find('td.title img').attr('src', self.getIcon());
-				self.fileLine.$file.find('td.title img').attr('src', self.getIcon());
 				self.fileLine.$file.find('td.title .txt').html(self.file.name);
 				
 				self.fileLine.$file.find('td.size').html(self.file.strSize);

@@ -4,13 +4,7 @@
 
 var thisPage = false;
 
-var socket = io.connect('/module', {
-	'connect timeout': 500,
-	'reconnect': true,
-	'reconnection delay': 500,
-	'reopen delay': 500,
-	'max reconnection attempts': 10
- });
+var socket = io.connect('/module');
 
  
  var thisPage = new Page();
@@ -18,34 +12,122 @@ var socket = io.connect('/module', {
 
 
 
-
-
-
-
+	
+	
 /***
-** Script principal
+** Routing
 ***/
 
-$(document).ready(function () {
+function route(route) {
+	var args = getArgs(route);
+	thisPage.load({
+		module	: args.module,
+		action	: 'list'
+	});
+	$('#menuLAMD').find('li.module[data-module="'+args.module+'"]').addClass('current');
+}
+function getArgs (route) {
+	route = route.replace('#', '');
 	
-	/***
-	** Routing
-	***/
+	var allArgs = route.split('-');
+	var args = {};
+	for ( var i=0; i<allArgs.length; i++ ) {
+		var tmp = allArgs[i].split(':');
+		
+		if ( tmp[1] )   value = tmp[1]
+		else			value = '';
+		args[tmp[0]] = value;
+	}
+	args[args.action] = {};
 	
-	// Routing sur chargement de la page --- no more used
-	/*anchor = window.location.hash;
-    anchor = anchor.substring(1,anchor.length);
+	for ( var p in args ) {
+		if ( p == 'module' )  args.module = args[p];
+		else if ( p != args.action ) {
+			args[args.action][p] = args[p];
+		}
+	}
+	return args;
+}
+
+
+function loadPackages () {
+	socket.emit('packages', function (err, tpl) {
+		if (err) alert(err);
+		else {
+			$('#menuLAMD').html(tpl);
+			routing();
+		}
+	});
+}
+
+// Routing sur chargement de la page
+function routing () {
+	anchor = window.location.hash;
+	anchor = anchor.substring(1,anchor.length);
 	if ( !anchor.isEmpty() ) {
 		route(anchor);
 	}
+}
+
+
+
+$(document).ready(function () {
+	/***
+	** Packages
+	***/
 	
-	// Routing sur Liens
-	$('*[data-route]').live('click', function () {
-		var url = $(this).data('route');
-		
-		route(url);
+	socket.on('connect', function () {
+		loadPackages();
+		$('#menuLAMD').find('.load').live('click', function () {
+			loadPackages();
+		});
 	});
-	*/
+	
+	
+	
+	
+	/***
+	** Menu LAMD  -  Packages
+	***/
+	$('#page').find('.packages .selected').live('click', function () {
+		$('#page').find('.packages .others').slideToggle('fast');
+		$(this).toggleClass('active');
+	});
+	$('#page').find('.packages .others .package').live('click', function () {
+		socket.emit('setPackage', $(this).attr('data-package'), function () {
+			loadPackages();
+		});
+	});
+	
+	/***
+	** Menu LAMD  -  Modules
+	***/
+	$('#menuLAMD').find('ul.lamd').find('li.module').live('click', function () {
+		var $menu = $('#menuLAMD').find('ul.lamd');
+		$menu.find('li.module.current').removeClass('current');
+		$menu.find('li.module.current2').removeClass('current2');
+		$menu.find('li.view.current').removeClass('current');
+		$(this).addClass('current');
+		
+		thisPage.load({
+			module		: $(this).attr('data-module'),
+			page		: 1,
+			action		: 'list',
+			list		: { view : 'main'}
+		});
+	});
+	$('#menuLAMD').find('ul.lamd').find('li.view').live('click', function () {
+		var $menu = $('#menuLAMD').find('ul.lamd');
+		$menu.find('li.module.current').addClass('current2');
+		$menu.find('li.module.current').removeClass('current');
+		$menu.find('li.view.current').removeClass('current');
+		$(this).addClass('current');
+		
+		thisPage.args.list.page = 1;
+		thisPage.changeView($(this).attr('data-view'));
+	});
+	
+	
 	
 	
 	/***
@@ -209,8 +291,14 @@ $(document).ready(function () {
 		if ( !type )  type = $(this).parent().attr('type');
 		
 		if ( type == 'checkbox' ) {
-			if ( $(this).attr('data-checked') == 'true' )	$(this).attr('data-checked', 'false')
-			else											$(this).attr('data-checked', 'true') 
+			if ( $(this).attr('data-checked') == 'true' ) {
+				$(this).attr('data-checked', 'false')
+				$(this).parent().attr('data-checked', 'false')
+			}
+			else {
+				$(this).attr('data-checked', 'true')
+				$(this).parent().attr('data-checked', 'true')
+			}
 		}
 		else {
 			$(this).parent().find('.case').attr('data-checked', 'false');
@@ -248,37 +336,6 @@ $(document).ready(function () {
 				break;
 		}
 	});
-	
-	
-	
-	
-	/***
-	** Menu LAMD
-	***/
-	$menu = $('#page').find('ul.lamd');
-	$menu.find('li.module').live('click', function () {
-		$menu.find('li.module.current').removeClass('current');
-		$menu.find('li.module.current2').removeClass('current2');
-		$menu.find('li.view.current').removeClass('current');
-		$(this).addClass('current');
-		
-		thisPage.load({
-			module		: $(this).attr('data-module'),
-			page		: 1,
-			action		: 'list',
-			list		: { view : 'main'}
-		});
-	});
-	$menu.find('li.view').live('click', function () {
-		$menu.find('li.module.current').addClass('current2');
-		$menu.find('li.module.current').removeClass('current');
-		$menu.find('li.view.current').removeClass('current');
-		$(this).addClass('current');
-		
-		thisPage.changeView($(this).attr('data-view'));
-	});
-	
 });
-
 
 

@@ -12,6 +12,8 @@ div#page.back
 				div.btn.confirm 	Confirmer
 				div.btn.cancel 		Annuler
 	
-	div#menuLAMD!= partial('layout/menu_lamd.jade')
+	div#menuLAMD
+		.loader
+			img(src='/public/img/ajax-loader.gif')
 	div#corps!= partial('../back/lamd.jade')
 		

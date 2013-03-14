@@ -61,6 +61,7 @@ function Uploads (param) {
 		this.elem.$table.find('td.option.del').live('click', function () {
 			self.feedback().askRemoveUpload($(this).parent().attr('data-file'));
 		});
+		// Confirmer la suppression du fichier
 		this.elem.$feedback.find('.confirm').live('click', function () {
 			var name = $(this).attr('data-file');
 			var statut = self.all[name].getStatut();
@@ -103,6 +104,7 @@ function Uploads (param) {
 		});
 		socket.on('upload-ended', function (data){
 			if ( !self.all[data.name] ) return;
+			working.uploads--;
 			self.ended(data.name);
 		});
 	}
@@ -183,6 +185,7 @@ function Uploads (param) {
 	}
 	this.stop = function (name) {
 		this.all[name].stop();
+		this.all = _.omit(this.all, name);
 	}
 	
 	this.ended = function (name) {
@@ -294,6 +297,7 @@ function Upload (file, param) {
 	this.start = function () {
 		var self = this;
 		this.uploading = true;
+		working.uploads++;
 		if ( this.reader )		this.reader.abort();
 		this.reader = new FileReader();
 		
@@ -318,7 +322,9 @@ function Upload (file, param) {
 	}
 	
 	this.stop = function () {
+		working.uploads--;
 		this.uploading = false;
+		this.feedback().removeUpload();
 	}
 	
 	this.more = function (data) {
@@ -416,6 +422,7 @@ function Upload (file, param) {
 			var file = this.file.name;
 			
 			type = this.param.statut;
+			if (type == 'pub') type = 'public';
 		}
 		else {
 			var file = this.file.name;
@@ -472,7 +479,7 @@ function Upload (file, param) {
 				self.elem.$forms.find('.form[data-file="'+self.file.name+'"]').remove();
 			},
 			showForm	 : function (name) {
-				self.fileLine.$form.fadeOut(speed.fast);
+				self.fileLine.$form.hide();
 				self.fileLine.$form.fadeIn(speed.fast);
 			},
 			hideForm	 : function (name) {
@@ -539,7 +546,7 @@ function Upload (file, param) {
 		return icon;
 	}
 	this.publicDisplay = function () {
-		if (this.param.media == 'img' && this.param.statut == 'public') {
+		if (this.param.media == 'img' && this.param.statut == 'pub') {
 			return true;
 		}
 		return false;

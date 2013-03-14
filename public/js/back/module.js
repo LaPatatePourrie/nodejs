@@ -1,4 +1,6 @@
-
+var working = {
+	uploads		: 0
+}
 
 
 /*********
@@ -57,7 +59,6 @@ function Page () {
 		var self = this;
 		// On charge les éléments jQuery
 		this.loadElems();
-		this.setHandlers();
 		
 		this.updateArgs(args);
 		
@@ -141,7 +142,9 @@ function Page () {
 		var param = this.args.list;
 		
 		if ( newModule ) { 
-			self.reinit();
+			this.reinit();
+			// Affichage du sous-menu des vues
+			this.displayMenu();
 		}
 		
 		this.Module.list(param, function (err, tpl) {
@@ -172,10 +175,6 @@ function Page () {
 			if ( self.args.list.keywords ) {
 				$('#module .search input').focusend();
 			}
-			// Affichage du sous-menu des vues
-			if ( newModule ) {
-				self.displayMenu();
-			}
 		});
 	}
 	// Form
@@ -202,8 +201,13 @@ function Page () {
 		});
 	}
 	// Add - Mod
-	this.addMod = function () {
+	this.addMod = function (force) {
 		var self = this;
+		
+		if ( !force && working.uploads > 0 ) {
+			this.feedback({flag : 'error', type : 'uploading'}).displayPostit();
+			return;
+		}
 		
 		var datas = this.Module.Form.getDatas();
 		var mode = this.Module.Form.getMode();
@@ -221,6 +225,7 @@ function Page () {
 				case 'add' :
 					self.elem.$module.find('table.main tr.title').after('<tr class="value" data-checked="false" data-id="'+id+'">'+tpl+'</tr>');
 					self.setListDetails(self.elem.$module.find('table.main tr.value[data-id="'+id+'"]'));
+					self.scrollTop();
 					break;
 					
 				case 'mod' :
@@ -330,7 +335,7 @@ function Page () {
 						
 						$td.html(html);
 						break;
-						
+					
 					case 'link' :
 						var filesNames = files.split('/');
 						var links = fullvalue.split('/');
@@ -463,12 +468,12 @@ function Page () {
 			code = e.keyCode ? e.keyCode : e.which;
 			
 			if ( code == 27 ) {
-				self.hideOverlay();
+				self.exitForm();
 			}
 		});
 		// Clique sur cancel
 		$('.header .cancel').live('click', function () {
-			self.hideOverlay();
+			self.exitForm();
 		});
 	}
 	
@@ -547,7 +552,8 @@ function Page () {
 				'del'		: 'Suppression effectu&eacute;e'
 			},
 			'error' : {
-				'nonAuthorized'	: 'Vous n\'&ecirc;tes pas autoris&eacute; &agrave; effectuer cette action'
+				'nonAuthorized'	: 'Vous n\'&ecirc;tes pas autoris&eacute; &agrave; effectuer cette action',
+				'uploading'		: 'Des t&eacute;l&eacute;chargements sont en cours'
 			}
 		};		
 		
@@ -589,19 +595,19 @@ function Page () {
 					},
 					7000
 				);
-			},
-			
-			// Scroll jusqu'à la ligne
-			scroll			: function () {
-				var $elem = $('#module table.main tr[data-id="'+param.id+'"]');
-				
-				if ( param.id && $elem.length == 1 ) {
-					$('html, body').animate({scrollTop: $elem.offset().top - 400}, 0);
-				}
 			}
 		};
 		
 		return feed;
+	}
+	
+	this.exitForm = function (force) {
+		if ( !force && working.uploads > 0 ) {
+			this.feedback({flag : 'error', type : 'uploading'}).displayPostit();
+		}
+		else {
+			this.hideOverlay();
+		}
 	}
 	
 	this.reinit	= function () {
@@ -612,10 +618,12 @@ function Page () {
 		// Init views
 		this.args.list.keywords = false;
 	}
-	
 	this.displayMenu = function () {
 		this.elem.$menu.find('li.view').slideUp(100);
 		this.elem.$menu.find('li.view[data-module="'+this.Module.name+'"]').slideDown('fast');
+	}
+	this.scrollTop = function () {
+		$('html, body').animate({scrollTop: 0}, 200);
 	}
 }
 
@@ -756,6 +764,7 @@ function Form(fields, order) {
 			}
 		}
 	}
+	
 	this.getDatas = function () {
 		var datas = {};
 		datas.id = this.elem.$form.attr('data-id');
@@ -1173,6 +1182,18 @@ function Field(name) {
 	this.getField = function (field) {
 		return $('tr[data-field="'+field+'"]');
 	}
+	
+	this.getMode = function () {
+		return this.elem.$form.attr('data-mode');
+	}
+	this.isActive = function () {
+		if (this.elem.$tr.attr('data-active') == 'false' ) return false;
+		return true;
+	}
+	this.fillTextarea = function () {
+		this.elem.$export.html(CKEDITOR.instances[this.name].getData());
+	}
+	
 
 	this.fieldFeedback = function (param) {
 		var self = this;
@@ -1209,17 +1230,6 @@ function Field(name) {
 		return this.errors;
 	}
 	
-	this.getMode = function () {
-		return this.elem.$form.attr('data-mode');
-	}
-	this.isActive = function () {
-		if (this.elem.$tr.attr('data-active') == 'false' ) return false;
-		return true;
-	}
-	this.fillTextarea = function () {
-		this.elem.$export.html(CKEDITOR.instances[this.name].getData());
-	}
-	
 	
 	// Vérification des erreurs
 	this.error = function (field, data) {
@@ -1230,7 +1240,7 @@ function Field(name) {
 		var check = {
 			notEmpty : function () {
 				var flag = true;
-				if ( data == '' ||  field.getDefaultValue() == data ) flag = false;
+				if ( data.length == 0 ||  field.getDefaultValue() == data ) flag = false;
 				
 				return {flag : flag, txt : field.fieldFeedback().notEmpty};
 			},

@@ -16,6 +16,7 @@ exports.load = function (mongoose) {
 				date 	: { type : Date, default : Date.now }
 			}),
 			
+			// Test
 			users : new mongoose.Schema({
 				login 		: String,
 				passwd 		: String,
@@ -43,7 +44,35 @@ exports.load = function (mongoose) {
 			}),
 			
 			categories : new mongoose.Schema({
-				titre			: String
+				titre			: String,
+				fichiers		: [File]
+			}),
+			
+			
+			// Emprunts
+			oeuvre_categories : new mongoose.Schema({
+				nom			: String
+			}),
+			
+			oeuvres : new mongoose.Schema({
+				titre			: String,
+				auteur			: String,
+				realisateurs	: String,
+				acteurs			: String,
+				_idCategorie	: String,
+				dateParution	: Date,
+				type			: String,
+				img				: [File],
+				description		: String
+			}),
+			
+			emprunts : new mongoose.Schema({
+				_idOeuvre	: String,
+				emprunteur	: String,
+				dateEmprunt	: Date,
+				dateRetour	: Date,
+				rendu		: Number,
+				urgence		: Number,
 			})
 		};
 	

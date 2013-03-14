@@ -1,58 +1,19 @@
 this.statut = 5;
 
-var modules = {
-	_category 		: {
-		'Jeux'			: [
-				'jeux',
-				'category'
-		],
-		'Utilisateurs'	: [
-				'users'
-		]
-	}
-}
-
-exports.load = function (param, callback) {
-	var tpl = {};
-	
-	for ( c in modules._category ) {
-		var category = modules._category[c];
-		for ( var i=0; i<category.length; i++ ) {
-			var moduleName = category[i];
-			var path = pwd+'/application/controllers/back/modules/'+moduleName+'.ctrl.js';
-			
-			// Le module existe
-			if ( fs.existsSync(path) ) {
-				var module = require(path).load();
-				// Droits sur le module
-				module.auth = isAllowed(module, param.user);
-				modules[moduleName] = module;
-			}
-		}
-	}
-	
-	tpl.modules = modules;
-	
-	param.main.tpl = tpl;
-	callback(param);
-};
-
-
-
-
-
 
 /****
 *** Variables globales
 ****/
+
 var jade = new jade();
 
 var pathView = pwd+'/application/views/back/';
 var views = {
 	list   		: pathView+'list.jade',
-	element   		: pathView+'element.jade',
+	element   	: pathView+'element.jade',
 	form		: pathView+'form.jade',
-	options		: pathView+'options.jade'
+	options		: pathView+'options.jade',
+	menu		: pathView+'menu.jade'
 }
 
 var working = {};
@@ -61,19 +22,73 @@ var thisModule = false;
 var dflt = {
 	separator 		: ' - '
 }
+
 var files = {};
-var dir = {
-	tmp			: pwd+'/public/tmp/',
-	uploaded	: {
-		priv		: pwd+'/data/uploads/',
-		pub			: pwd+'/public/uploads/'
+
+var users = lib.users.Users();
+
+
+
+/****
+*** Packages, catégories, modules
+****/
+
+var packs = {
+	loaded		: false,
+	selected	: 'emprunts',
+	all			: {
+		'emprunts' 		: {
+			title		: 'Emprunts',
+			categories  : {
+				order		: ['emprunts', 'oeuvres'],
+				all			: {
+					'emprunts'	: {
+						title		: 'Emprunts',
+						order		: [
+							'emprunts'
+						]
+					},
+					'oeuvres'		: {
+						title		: 'Oeuvres',
+						order		: [
+							'oeuvres',
+							'categories'
+						]
+					}
+				}
+			}
+		},
+		'test' 		: {
+			title		: 'Package-test',
+			categories  : {
+				order		: ['users'],
+				all			: {
+					'users'	: {
+						title		: 'Utilisateurs',
+						order		: [
+							'users',
+							'jeux'
+						]
+					}
+				}
+			}
+		}
 	}
-}
+};
 
 
 
 
-	
+exports.load = function (param, callback) {
+	callback(param);
+};
+
+
+
+
+
+
+
 /****
 *** Sockets
 ****/
@@ -82,22 +97,75 @@ exports.sockets = function (param) {
 	var io = param.io;
 	var model = param.model;
 	
-	
 	param.socketAuthorization();
 	
 	io.of('/module').on('connection', function (socket) {
-		if ( !modules ) return;
-		
 		var thisUser = param.getThisUser(socket, lib.users);
+		
+		if ( !users.get(thisUser.login) ) {
+			users.add(thisUser);
+		}
+		else {
+			thisUser = users.get(thisUser.login);
+		}
+		
+		
+		/*****
+		***	Packages
+		*****/
+		
+		socket.on('packages', function (callback) {
+			console.log('Packages');
+			// Définition des droits sur les modules
+			for ( p in packs.all ) {
+				packs.all[p].modules = {};
+				
+				for ( c in packs.all[p].categories.all ) {
+					var category = packs.all[p].categories.all[c];
+					
+					for ( var k=0; k<category.order.length; k++ ) {
+						var m = category.order[k];
+						var path = pwd+'/application/controllers/back/modules/'+p+'/'+m+'.ctrl.js';
+						
+						// Le module existe
+						if ( fs.existsSync(path) ) {
+							var module = require(path).load();
+							packs.all[p].modules[m] = module;
+							// Droits sur le module
+							packs.all[p].modules[m].auth = isAllowed(module, thisUser);
+						}
+					}
+				}
+			}
+			
+			if ( thisUser.lamd && thisUser.lamd.selectedPackage ) packs.selected = thisUser.lamd.selectedPackage
+			
+			vars = {packs : packs, user : thisUser};
+			tpl = jade.render(views.menu, vars);
+			callback(false, tpl);
+		});
+		
+		// Changement de package
+		socket.on('setPackage', function (pack, callback) {
+			if (!packs.all[pack]) return;
+			if (!thisUser.lamd) thisUser.lamd = {};
+			
+			thisUser.lamd.selectedPackage = pack;
+			console.log('Set package : '+pack);
+			callback();
+		});
+		
+		
 		
 		
 		/*****
 		***	Module
 		*****/
 		
+		// Nouveau module
 		socket.on('getModule', function (module, callback) {
 			if ( working.getModule ) return;
-			if ( thisModule && thisModule.name == module ) {
+			if ( thisModule && thisModule.name == param.module ) {
 				// Le module est déjà chargé
 				// On recharge les droits
 				thisModule.auth = isAllowed(thisModule, thisUser);
@@ -107,7 +175,7 @@ exports.sockets = function (param) {
 			}
 			
 			// Le module n'existe pas
-			if ( !modules[module] ) {
+			if ( !packs.all[packs.selected].modules[module] ) {
 				callback({txt : 'Le module n\'existe pas.'});
 				return;
 			}
@@ -118,7 +186,7 @@ exports.sockets = function (param) {
 			// Le module existe
 			// Chargement du nouveau module
 			console.log('GetModule');
-			thisModule = modules[module];
+			thisModule = packs.all[packs.selected].modules[module];
 			
 			if ( !thisModule.auth.main ) {
 				// Non autorisé
@@ -190,7 +258,7 @@ exports.sockets = function (param) {
 					else if ( field.display === false ) 	field.display = {list:false, form:false};
 					
 					if ( !field.display) 					field.display = {list : true, form : true};
-					if ( !field.display.maxLength)			field.display.maxLength = 20;
+					if ( !field.display.maxLength)			field.display.maxLength = 150;
 					
 					// Trigers
 					if ( field.triggers) {
@@ -526,7 +594,9 @@ exports.sockets = function (param) {
 					ids		: param.ids
 				},
 				function(err) {
-					removeUploadedFiles(param.ids)
+					if ( thisModule.uploads ) {
+						removeUploadedFiles(param.ids);
+					}
 					callback();
 					working.del = false;
 					console.log('Id supprimed : '+param.ids)
@@ -590,28 +660,24 @@ exports.sockets = function (param) {
 				size 		: data['size'],
 				data 		: '',
 				downloaded  : 0,
-				path		: getTmpPath(name),
+				path		: filePath('tmp').file(name),
 				ended 		: false
 				
 			}
 			var place = 0;
 			console.log(files[name]);
+			
 			// Si le fichier existe on le supprime
-			fs.lstat(files[name].path, function (err, stat) {
-				if ( !err && stat.isFile() ) {
-					console.log('File existed, deleted');
-					fs.unlinkSync(files[name].path);
-				}
-				startUpload();
-			});
+			fs.unlink(files[name].path);
+			startUpload();
 			
 			console.log('New upload');
 			// L'upload commence
 			function startUpload () {
-				fs.lstat(getTmpDir(), function(err, stats) {
+				fs.lstat(filePath('tmp').dir(), function(err, stats) {
 					if ( err || !stats.isDirectory() ) {
 						// Création du répertoire temporaire du module
-						fs.mkdirSync(getTmpDir());
+						fs.mkdirSync(filePath('tmp').dir()());
 					}
 					fs.open(files[name].path, 'a', 0777, function(err, fd)	{
 						if(err) console.log(err);
@@ -665,7 +731,6 @@ exports.sockets = function (param) {
 				});
 			}
 			else {
-				console.log('Upload more');
 				var place = files[name].downloaded / 524288;
 				var percent = (files[name].downloaded / files[name].size) * 100;
 			
@@ -684,7 +749,7 @@ exports.sockets = function (param) {
 			if ( files[name] ) {
 				var path = files[name].path;
 				if ( data.statut == 'previously' ) {
-					path = getUploadedPath(name);
+					path = filePath('uploads').file(name);
 				}
 				console.log('Deleting : '+path);
 				fs.unlink(path);
@@ -698,14 +763,14 @@ exports.sockets = function (param) {
 		
 		socket.on('upload-previously', function (file, callback) {
 			files[file.name] = file;
-			files[file.name].path = getTmpPath(file.name);
+			files[file.name].path = filePath('tmp').file(file.name);
 			callback();
 		});
 		
 		socket.on('upload-checkFile', function (files, callback) {
 			var existing = [];
 			for ( var i=0; i<files.length; i++ ) {
-				var path = getUploadedPath(files[i].name);
+				var path = filePath('uploads').file(files[i].name);
 				if ( fs.existsSync(path) ) existing.push(files[i]);
 			}
 			callback(existing);
@@ -717,86 +782,108 @@ exports.sockets = function (param) {
 			console.log('moveUploadedFiles');
 			
 			var uploads = data[thisModule.uploads.field];
-			if ( !uploads) return;
 			
+			if ( !uploads) return;
 			if ( !id ) var id = data._id;
 			
-			var uploadDir = getUploadedDir();
-			var uploadIdDir = getUploadedIdDir(id);
 			
-			fs.lstat(uploadDir, function(err, stats) {
+			fs.lstat(filePath('uploads').dir().module, function(err, stats) {
 				if ( err || !stats.isDirectory() ) {
 					// Création du répertoire du module
-					fs.mkdirSync(uploadDir);
+					fs.mkdirSync(filePath('uploads').dir().module);
 				}
 				
-				fs.lstat(uploadIdDir, function(err, stats) {
+				fs.lstat(filePath('uploads').dir(id).id, function(err, stats) {
 					if ( err || !stats.isDirectory() ) {
 						// Création du répertoire de l'élément ID
-						fs.mkdirSync(uploadIdDir);
+						fs.mkdirSync(filePath('uploads').dir(id).id);
 					}
 					for ( var i=0; i<uploads.length; i++ ) {
 						var name = uploads[i].name;
 						var path = {
-							from 	: getTmpPath(name), 
-							to 		: getUploadedPath(name, id)
+							from 	: filePath('tmp').file(name), 
+							to 		: filePath('uploads').file(name, id)
 						}
 						
-						if (!fs.existsSync(path.from))			console.log('Le fichier source n\'existe '+path.from);
-						else if (fs.existsSync(path.to))		console.log('Le fichier cible existe deja');
-						else if (!files[name].ended)			console.log('Le téléchargement n\'est pas termine');
-						else {
-							fs.move(path.from, path.to, function (err) {
+						if (!fs.existsSync(path.from)) {
+							console.log('Le fichier source n\'existe pas : '+path.from);
+						}
+						else if (fs.existsSync(path.to)) {
+							fs.unlink(path.to);
+							move(path);
+							console.log('Le fichier cible existe deja');
+						}
+						else if (!files[name].ended) {
+							fs.unlinkSync(path.from);
+							fs.close(files[name].handler, function (err) {
 								if (err) console.log(err);
-								console.log('File moved to '+path.to);
 							});
+							console.log('Le téléchargement n\'est pas termine');
+						}
+						else {
+							move(path);
 						}
 					}
 				});
 			});
+			
+			function move (path) {
+				fs.move(path.from, path.to, function (err) {
+					if (err) console.log(err);
+					console.log('File moved to '+path.to);
+				});
+			}
 		}
 		function removeUploadedFiles (ids) {
 			for ( var i=0; i<ids.length; i++ ) {
-				var dir = getUploadedIdDir(ids[i]);
-				removeDir(dir);
+				var dir = filePath('uploads').dir(ids[i]).id;
 				
-				function removeDir(dir) {
-					fs.lstat(dir, function(err, stats) {
-						if ( !err && stats.isDirectory() ) {
-							// Le répertoire existe
-							fs.rmdirfSync(dir);
-							console.log('Répertoire '+dir+' supprimé');
-						}
-					});
-				}
+				fs.lstat(dir, function(err, stats) {
+					if ( !err && stats.isDirectory() ) {
+						// Le répertoire existe
+						fs.rmdirfSync(dir);
+						console.log('Répertoire '+dir+' supprimé');
+					}
+				});
 			}
 		}
-		function getTmpDir () {
-			var path = dir.tmp+thisModule.name;
-			return path;
-		}
-		function getUploadedDir () {
-			var statut = 'priv';
-			if (thisModule.uploads.param.file.statut == 'public') statut = 'pub';
+		
+		function filePath(type) {
+			var statut = thisModule.uploads.param.file.statut;
+			var module = thisModule.name;
+			var directories = {
+				tmp			: pwd+'/public/tmp/',
+				uploaded	: {
+					priv		: pwd+'/data/uploads/',
+					pub			: pwd+'/public/uploads/'
+				}
+			}
+
+			this.dir = function (id) {
+				if ( type == 'uploads' ) {
+					var path = directories.uploaded[statut]+module;
+					return {
+						module	: path,
+						id		: path+'/'+id
+					}
+				}
+				else if ( type == 'tmp' ) {
+					return directories.tmp+module; 
+				}
+			}
+			this.file = function (name, id) {
+				if ( !id && thisModule.form ) id = thisModule.form.id;
+				
+				if ( type == 'uploads' ) {
+					var path = this.dir(id).id+'/'+name;
+				}
+				else if ( type == 'tmp' ) {
+					var path = this.dir()+'/'+name;
+				}
+				return path; 
+			}
 			
-			var path = dir.uploaded[statut]+thisModule.name;
-			return path;
-		}
-		function getUploadedIdDir (id) {
-			var path = getUploadedDir()+'/'+id;
-			return path;
-		}
-		function getUploadedPath (name, id) {
-			var statut = 'priv';
-			if (thisModule.uploads.param.file.statut == 'public') statut = 'pub';
-			if (!id) id = thisModule.form.id;
-			
-			var path = dir.uploaded[statut]+thisModule.name+'/'+id+'/'+name;
-			return path;
-		}
-		function getTmpPath (name) {
-			var path = dir.tmp+thisModule.name+'/'+name;
-			return path;
+			return this;
 		}
 		
 		
@@ -915,7 +1002,6 @@ exports.sockets = function (param) {
 	
 	function manageInputData(data) {
 		console.log('Manage input');
-		console.log(data);
 		var fields = thisModule.fields.all;
 		
 		data = noNullData([data]);
