@@ -1,9 +1,10 @@
-
 /*!
  * Jade - Lexer
  * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
  * MIT Licensed
  */
+
+var utils = require('./utils');
 
 /**
  * Initialize `Lexer` with the given `str`.
@@ -121,9 +122,9 @@ Lexer.prototype = {
       , nend = 0
       , pos = 0;
     for (var i = 0, len = str.length; i < len; ++i) {
-      if (start == str[i]) {
+      if (start == str.charAt(i)) {
         ++nstart;
-      } else if (end == str[i]) {
+      } else if (end == str.charAt(i)) {
         if (++nend == nstart) {
           pos = i;
           break;
@@ -166,6 +167,20 @@ Lexer.prototype = {
   },
 
   /**
+   * Blank line.
+   */
+  
+  blank: function() {
+    var captures;
+    if (captures = /^\n *\n/.exec(this.input)) {
+      this.consume(captures[0].length - 1);
+      ++this.lineno;
+      if (this.pipeless) return this.tok('text', '');
+      return this.next();
+    }
+  },
+
+  /**
    * Comment.
    */
   
@@ -178,14 +193,26 @@ Lexer.prototype = {
       return tok;
     }
   },
-  
+
+  /**
+   * Interpolated tag.
+   */
+
+  interpolation: function() {
+    var captures;
+    if (captures = /^#\{(.*?)\}/.exec(this.input)) {
+      this.consume(captures[0].length);
+      return this.tok('interpolation', captures[1]);
+    }
+  },
+
   /**
    * Tag.
    */
   
   tag: function() {
     var captures;
-    if (captures = /^(\w[-:\w]*)/.exec(this.input)) {
+    if (captures = /^(\w[-:\w]*)(\/?)/.exec(this.input)) {
       this.consume(captures[0].length);
       var tok, name = captures[1];
       if (':' == name[name.length - 1]) {
@@ -196,6 +223,7 @@ Lexer.prototype = {
       } else {
         tok = this.tok('tag', name);
       }
+      tok.selfClosing = !! captures[2];
       return tok;
     }
   },
@@ -237,15 +265,47 @@ Lexer.prototype = {
    */
   
   text: function() {
-    return this.scan(/^(?:\| ?)?([^\n]+)/, 'text');
+    return this.scan(/^(?:\| ?| ?)?([^\n]+)/, 'text');
   },
 
   /**
    * Extends.
    */
   
-  extends: function() {
-    return this.scan(/^extends +([^\n]+)/, 'extends');
+  "extends": function() {
+    return this.scan(/^extends? +([^\n]+)/, 'extends');
+  },
+
+  /**
+   * Block prepend.
+   */
+  
+  prepend: function() {
+    var captures;
+    if (captures = /^prepend +([^\n]+)/.exec(this.input)) {
+      this.consume(captures[0].length);
+      var mode = 'prepend'
+        , name = captures[1]
+        , tok = this.tok('block', name);
+      tok.mode = mode;
+      return tok;
+    }
+  },
+  
+  /**
+   * Block append.
+   */
+  
+  append: function() {
+    var captures;
+    if (captures = /^append +([^\n]+)/.exec(this.input)) {
+      this.consume(captures[0].length);
+      var mode = 'append'
+        , name = captures[1]
+        , tok = this.tok('block', name);
+      tok.mode = mode;
+      return tok;
+    }
   },
 
   /**
@@ -253,7 +313,24 @@ Lexer.prototype = {
    */
   
   block: function() {
-    return this.scan(/^block +([^\n]+)/, 'block');
+    var captures;
+    if (captures = /^block\b *(?:(prepend|append) +)?([^\n]*)/.exec(this.input)) {
+      this.consume(captures[0].length);
+      var mode = captures[1] || 'replace'
+        , name = captures[2]
+        , tok = this.tok('block', name);
+
+      tok.mode = mode;
+      return tok;
+    }
+  },
+
+  /**
+   * Yield.
+   */
+  
+  yield: function() {
+    return this.scan(/^yield */, 'yield');
   },
 
   /**
@@ -265,16 +342,62 @@ Lexer.prototype = {
   },
 
   /**
+   * Case.
+   */
+  
+  "case": function() {
+    return this.scan(/^case +([^\n]+)/, 'case');
+  },
+
+  /**
+   * When.
+   */
+  
+  when: function() {
+    return this.scan(/^when +([^:\n]+)/, 'when');
+  },
+
+  /**
+   * Default.
+   */
+  
+  "default": function() {
+    return this.scan(/^default */, 'default');
+  },
+
+  /**
    * Assignment.
    */
   
   assignment: function() {
     var captures;
-    if (captures = /^(\w+) += *([^\n]+)/.exec(this.input)) {
+    if (captures = /^(\w+) += *([^;\n]+)( *;? *)/.exec(this.input)) {
       this.consume(captures[0].length);
       var name = captures[1]
         , val = captures[2];
-      return this.tok('code', 'var ' + name + ' = (' + val + ')');
+      return this.tok('code', 'var ' + name + ' = (' + val + ');');
+    }
+  },
+
+  /**
+   * Call mixin.
+   */
+  
+  call: function(){
+    var captures;
+    if (captures = /^\+([-\w]+)/.exec(this.input)) {
+      this.consume(captures[0].length);
+      var tok = this.tok('call', captures[1]);
+      
+      // Check for args (not attributes)
+      if (captures = /^ *\((.*?)\)/.exec(this.input)) {
+        if (!/^ *[-\w]+ *=/.test(captures[1])) {
+          this.consume(captures[0].length);
+          tok.args = captures[1];
+        }
+      }
+      
+      return tok;
     }
   },
 
@@ -284,7 +407,7 @@ Lexer.prototype = {
 
   mixin: function(){
     var captures;
-    if (captures = /^mixin +([-\w]+)(?:\(([^\)]+)\))?/.exec(this.input)) {
+    if (captures = /^mixin +([-\w]+)(?: *\((.*)\))?/.exec(this.input)) {
       this.consume(captures[0].length);
       var tok = this.tok('mixin', captures[1]);
       tok.args = captures[2];
@@ -318,7 +441,7 @@ Lexer.prototype = {
    * While.
    */
   
-  while: function() {
+  "while": function() {
     var captures;
     if (captures = /^while +([^\n]+)/.exec(this.input)) {
       this.consume(captures[0].length);
@@ -352,8 +475,8 @@ Lexer.prototype = {
       var flags = captures[1];
       captures[1] = captures[2];
       var tok = this.tok('code', captures[1]);
-      tok.escape = flags[0] === '=';
-      tok.buffer = flags[0] === '=' || flags[1] === '=';
+      tok.escape = flags.charAt(0) === '=';
+      tok.buffer = flags.charAt(0) === '=' || flags.charAt(1) === '=';
       return tok;
     }
   },
@@ -363,30 +486,35 @@ Lexer.prototype = {
    */
   
   attrs: function() {
-    if ('(' == this.input[0]) {
+    if ('(' == this.input.charAt(0)) {
       var index = this.indexOfDelimiters('(', ')')
         , str = this.input.substr(1, index-1)
         , tok = this.tok('attrs')
         , len = str.length
         , colons = this.colons
         , states = ['key']
+        , escapedAttr
         , key = ''
         , val = ''
         , quote
-        , c;
+        , c
+        , p;
 
       function state(){
         return states[states.length - 1];
       }
 
       function interpolate(attr) {
-        return attr.replace(/#\{([^}]+)\}/g, function(_, expr){
-          return quote + " + (" + expr + ") + " + quote;
+        return attr.replace(/(\\)?#\{([^}]+)\}/g, function(_, escape, expr){
+          return escape
+             ? _
+             : quote + " + (" + expr + ") + " + quote;
         });
       }
 
       this.consume(index + 1);
       tok.attrs = {};
+      tok.escaped = {};
 
       function parse(c) {
         var real = c;
@@ -407,7 +535,9 @@ Lexer.prototype = {
                 val = val.trim();
                 key = key.trim();
                 if ('' == key) return;
-                tok.attrs[key.replace(/^['"]|['"]$/g, '')] = '' == val
+                key = key.replace(/^['"]|['"]$/g, '').replace('!', '');
+                tok.escaped[key] = escapedAttr;
+                tok.attrs[key] = '' == val
                   ? true
                   : interpolate(val);
                 key = val = '';
@@ -426,6 +556,7 @@ Lexer.prototype = {
                 val += real;
                 break;
               default:
+                escapedAttr = '!' != p;
                 states.push('val');
             }
             break;
@@ -486,13 +617,19 @@ Lexer.prototype = {
                 val += c;
             }
         }
+        p = c;
       }
 
       for (var i = 0; i < len; ++i) {
-        parse(str[i]);
+        parse(str.charAt(i));
       }
 
       parse(',');
+
+      if ('/' == this.input.charAt(0)) {
+        this.consume(1);
+        tok.selfClosing = true;
+      }
 
       return tok;
     }
@@ -604,16 +741,25 @@ Lexer.prototype = {
   
   next: function() {
     return this.deferred()
+      || this.blank()
       || this.eos()
       || this.pipelessText()
+      || this.yield()
       || this.doctype()
-      || this.extends()
+      || this.interpolation()
+      || this["case"]()
+      || this.when()
+      || this["default"]()
+      || this["extends"]()
+      || this.append()
+      || this.prepend()
       || this.block()
       || this.include()
       || this.mixin()
+      || this.call()
       || this.conditional()
       || this.each()
-      || this.while()
+      || this["while"]()
       || this.assignment()
       || this.tag()
       || this.filter()
