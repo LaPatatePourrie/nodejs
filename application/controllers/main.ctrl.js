@@ -21,7 +21,7 @@ exports.load = function (param) {
 	}
 	// Le controller existe
 	else {
-		// L'utilisateur n'est pas autorisé à voir la page
+		// L'utilisateur n'est pas autorisé à voir ce module
 		if ( !user.isAuthorized(pack.ctrl.statut) ) {
 			param.req.session.redirect = param.req.url;
 			param.res.redirect('/login/nonAuthorized');
