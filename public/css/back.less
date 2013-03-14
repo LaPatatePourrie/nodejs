@@ -380,7 +380,7 @@
 				.bg-color(#fff);
 				
 				&:nth-child(2n+1)			 { .bg-color(#ebebeb); }
-				
+				&:hover 					 { .bg-color(#dbdbdb); }
 				&[data-statut="added"]	 	 { .bg-color(#ceffc7); }
 				&[data-statut="updated"]	 { .bg-color(#faf3aa); }
 				&[data-checked="true"]		 {
@@ -396,13 +396,13 @@
 				&.title {
 					.linear-gradient(#626262, #545454);
 					.bold;
-					color:#fff;
 					height:35px;
 					
 					td {
 						text-shadow: 1px 1px 0 #333333;
 						padding:5px 10px;
 						.wrap;
+						color:#fff;
 						
 						img { 
 							float:left;
@@ -746,6 +746,9 @@
 										}
 										textarea {
 											.textarea;
+											width:500px;
+											.radius(4px);
+											padding-top:4px;
 										}
 										label {
 											.block;

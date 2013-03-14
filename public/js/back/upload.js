@@ -555,6 +555,7 @@ function Upload (file, param) {
 		return this.fileLine.$file.attr('data-statut');
 	}
 	this.setStatut = function (statut) {
+		this.statut = statut;
 		this.fileLine.$file.attr('data-statut', statut);
 	}
 	this.getModule = function () {

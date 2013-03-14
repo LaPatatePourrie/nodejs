@@ -61,7 +61,7 @@ exports.load = function (param, callback) {
 						url		: {
 								label 		: 'Site web',
 								display		: {
-									list		: true,
+									list		: false,
 									form		: true,
 									maxLength	: 100
 								},
@@ -265,7 +265,6 @@ exports.load = function (param, callback) {
 												],
 												max			: 5,
 												maxSize		: 100000,
-												extend		: true,
 												statut		: 'pub',
 												media		: 'img'
 										}

@@ -16,6 +16,20 @@ exports.load = function (mongoose) {
 				date 	: { type : Date, default : Date.now }
 			}),
 			
+			
+			// Recettes
+			recettes : new mongoose.Schema({
+				titre			: String,
+				type			: String,
+				lien			: String,
+				ingredients		: String,
+				commentaires	: String,
+				note			: Number,
+				img				: [File]
+			}),
+			
+			
+			
 			// Test
 			users : new mongoose.Schema({
 				login 		: String,

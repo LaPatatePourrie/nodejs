@@ -177,6 +177,7 @@ function Page () {
 			}
 		});
 	}
+	
 	// Form
 	this.form = function (mode) {
 		this.showOverlay();
@@ -200,17 +201,19 @@ function Page () {
 			$('table tr.field:first-child input[type="text"]').focusend();
 		});
 	}
+	
 	// Add - Mod
-	this.addMod = function (force) {
+	this.addMod = function () {
 		var self = this;
-		
-		if ( !force && working.uploads > 0 ) {
-			this.feedback({flag : 'error', type : 'uploading'}).displayPostit();
-			return;
-		}
 		
 		var datas = this.Module.Form.getDatas();
 		var mode = this.Module.Form.getMode();
+		
+		if ( working.uploads > 0 ) {
+			// Uploads en cours
+			this.feedback({flag : 'error', type : 'uploading'}).displayPostit();
+			return;
+		}
 		
 		this.Module.addMod(mode, datas, function (id, tpl) {
 			self.hideOverlay();
@@ -601,12 +604,30 @@ function Page () {
 		return feed;
 	}
 	
-	this.exitForm = function (force) {
-		if ( !force && working.uploads > 0 ) {
+	this.exitForm = function () {
+		var self = this;
+		
+		if ( working.uploads > 0 ) {
 			this.feedback({flag : 'error', type : 'uploading'}).displayPostit();
 		}
-		else {
-			this.hideOverlay();
+		else  {
+			var uploads = {};
+			if ( this.Module.Form ) {
+				for ( f in this.Module.Form.fields ) {
+					var field = this.Module.Form.fields[f];
+					if ( field.uploads ) {
+						uploads = field.uploads.all;
+					}
+				}
+				if ( _.size(uploads) > 0 ) {
+					socket.emit('upload-deleteFiles', uploads)
+				}
+			}
+			exit();
+		}
+		
+		function exit () {
+			self.hideOverlay();
 		}
 	}
 	
@@ -851,7 +872,7 @@ function Field(name) {
 	this.display;
 	this.constraints = false;
 	this.triggers = false;
-	
+	this.uploads = false;
 	this.statut = '';
 	
 	this.requireAutovalidation = false;
@@ -1172,7 +1193,6 @@ function Field(name) {
 		var value = this.elem.$export.val();
 		
 		if ( this.param.type == 'checkbox' )  value = value.split(',');
-		if ( this.param.type == 'textarea' )  value = this.elem.$export.html();
 		
 		return value;
 	}
@@ -1279,7 +1299,7 @@ function Field(name) {
 			url : function (param) {
 				var flag = true;
 				var reg = new RegExp('^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', 'gi');
-				if ( !reg.test(data) )  flag = false;
+				if ( !reg.test(data) && data != 'http://' )  flag = false;
 				
 				return {flag :flag, txt : field.fieldFeedback(param).url};
 			},

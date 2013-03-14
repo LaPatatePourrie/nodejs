@@ -37,6 +37,20 @@ var packs = {
 	loaded		: false,
 	selected	: 'emprunts',
 	all			: {
+		'recettes' 		: {
+			title		: 'Recettes',
+			categories  : {
+				order		: ['recettes'],
+				all			: {
+					'recettes'	: {
+						title		: 'Recettes',
+						order		: [
+							'recettes'
+						]
+					},
+				}
+			}
+		},
 		'emprunts' 		: {
 			title		: 'Emprunts',
 			categories  : {
@@ -254,8 +268,10 @@ exports.sockets = function (param) {
 					if ( !field.label.form) 				field.label.form = field.label.list;
 					
 					// Display (list, form)
-					if ( field.display === true ) 			field.display = {list:true, form:true};
-					else if ( field.display === false ) 	field.display = {list:false, form:false};
+					if ( field.display === false ) 						field.display = {list:false, form:false};
+					if ( !field.display && field.display!== false ) 	field.display = {list:true, form:true};
+					if ( field.display === true ) 						field.display = {list:true, form:true};
+					if ( (!field.display.list && field.display.list!== false) && (!field.display.form && field.display.form!== false) ) 	{ field.display.list = true, field.display.form = true };
 					
 					if ( !field.display) 					field.display = {list : true, form : true};
 					if ( !field.display.maxLength)			field.display.maxLength = 150;
@@ -280,7 +296,15 @@ exports.sockets = function (param) {
 					}
 					
 					// Files
-					if ( field.param.type == 'file' ) 	thisModule.uploads = {param : field.param, field : f}
+					if ( field.param.type == 'file' ) {
+						thisModule.uploads = {param : field.param, field : f}
+						
+						if ( !field.param.file.maxSize ) 		field.param.file.maxSize = 1000000
+						if ( !field.param.file.statut ) 		field.param.file.statut = 'priv'
+						if ( !field.param.file.max ) 			field.param.file.max = 10
+						if ( !_.isArray(field.param.file.ext) )	field.param.file.ext = [field.param.file.ext];
+					}
+					
 					
 					fields[f] = field;
 				}
@@ -674,10 +698,10 @@ exports.sockets = function (param) {
 			console.log('New upload');
 			// L'upload commence
 			function startUpload () {
-				fs.lstat(filePath('tmp').dir(), function(err, stats) {
+				fs.lstat(filePath('tmp').dir().module, function(err, stats) {
 					if ( err || !stats.isDirectory() ) {
 						// Création du répertoire temporaire du module
-						fs.mkdirSync(filePath('tmp').dir()());
+						fs.mkdirSync(filePath('tmp').dir().module);
 					}
 					fs.open(files[name].path, 'a', 0777, function(err, fd)	{
 						if(err) console.log(err);
@@ -758,6 +782,17 @@ exports.sockets = function (param) {
 			}
 			else {
 				callback();
+			}
+		});
+		
+		socket.on('upload-deleteFiles', function (uploads) {
+			for ( u in uploads ) {
+				var upload = uploads[u];
+				if ( upload.statut != 'previously' ) {
+					var path = filePath('tmp').file(u);
+					console.log('Deleting unvalidate : '+path);
+					fs.unlink(path);
+				}
 			}
 		});
 		
@@ -852,23 +887,21 @@ exports.sockets = function (param) {
 			var statut = thisModule.uploads.param.file.statut;
 			var module = thisModule.name;
 			var directories = {
-				tmp			: pwd+'/public/tmp/',
-				uploaded	: {
+				tmp			: {
+					priv		: pwd+'/data/tmp/',
+					pub		: pwd+'/public/tmp/'
+				},
+				uploads	: {
 					priv		: pwd+'/data/uploads/',
 					pub			: pwd+'/public/uploads/'
 				}
 			}
 
 			this.dir = function (id) {
-				if ( type == 'uploads' ) {
-					var path = directories.uploaded[statut]+module;
-					return {
-						module	: path,
-						id		: path+'/'+id
-					}
-				}
-				else if ( type == 'tmp' ) {
-					return directories.tmp+module; 
+				var path = directories[type][statut]+module;
+				return {
+					module	: path,
+					id		: path+'/'+id
 				}
 			}
 			this.file = function (name, id) {
@@ -878,7 +911,7 @@ exports.sockets = function (param) {
 					var path = this.dir(id).id+'/'+name;
 				}
 				else if ( type == 'tmp' ) {
-					var path = this.dir()+'/'+name;
+					var path = this.dir().module+'/'+name;
 				}
 				return path; 
 			}

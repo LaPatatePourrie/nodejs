@@ -91,11 +91,7 @@ exports.load = function (param, callback) {
 						},
 						description		: {
 								param		: {
-										type 		: 'textarea',
-										widget		: {
-											wysiwyg		: 'ckeditor',
-											options		: {}
-										}
+										type 		: 'textarea'
 								},
 								label 		: {
 										list			: 'Description',
