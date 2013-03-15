@@ -702,8 +702,8 @@ exports.sockets = function (param) {
 			fs.unlink(files[name].path);
 			startUpload();
 			
-			console.log('New upload');
 			// L'upload commence
+			console.log('New upload');
 			function startUpload () {
 				fs.lstat(filePath('tmp').dir().module, function(err, stats) {
 					if ( err || !stats.isDirectory() ) {
