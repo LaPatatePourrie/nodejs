@@ -377,9 +377,9 @@ function Upload (file, param) {
 			$file.find('td.title .thumb').show();
 			$file.find('td.title .thumb a').attr('rel', 'galery');
 			
-			var href = '/public/tmp/'+this.getModule()+'/'+this.file.name;
+			var href = '/public/data/tmp/'+this.getModule()+'/'+this.file.name;
 			if ( this.getStatut() == 'previously' ) {
-				href = '/public/uploads/'+this.getModule()+'/'+$('form#lamd').attr('data-id')+'/'+this.file.name;
+				href = '/public/data/uploads/'+this.getModule()+'/'+$('form#lamd').attr('data-id')+'/'+this.file.name;
 			}
 			
 			$file.find('td.title .thumb a').attr('href', href);
@@ -415,21 +415,21 @@ function Upload (file, param) {
 	this.download = function () {
 		var url = false;
 		var module = '';
+			
+		var module = this.getModule();
+		var file = this.file.name;
+		var statut = this.param.statut;
+		if (statut == 'pub') statut = 'public';
 		
 		if ( this.getStatut() == 'previously' ){
 			var id = $('form#lamd').attr('data-id');
-			var module = this.getModule();
-			var file = this.file.name;
-			
-			type = this.param.statut;
-			if (type == 'pub') type = 'public';
+			var type = 'uploaded';
 		}
 		else {
-			var file = this.file.name;
 			var type = 'tmp';
 		}
 		
-		url = '/download/?file='+file+'&id='+id+'&type='+type+'&module='+module;
+		url = '/download/?file='+file+'&id='+id+'&type='+type+'&module='+module+'&statut='+statut;
 		// alert(url);
 		window.location = url;
 	}

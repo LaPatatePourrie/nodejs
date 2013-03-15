@@ -328,7 +328,7 @@ function Page () {
 						
 						var img = files.split('/');
 						for ( var i=0; i<img.length; i++ ) {
-							var href = '/public/uploads/'+module.name+'/'+id+'/'+img[i];
+							var href = '/public/data/uploads/'+module.name+'/'+id+'/'+img[i];
 							var rel	 = id;
 							
 							html += '<a class="lightbox" href="'+href+'" rel="'+rel+'">';

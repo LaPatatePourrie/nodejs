@@ -25,10 +25,15 @@ exports.load = function (param, callback) {
 		name	: query.file
 	}
 	
-	if ( query.type == 'tmp' )			file.path = pwd+'/public/tmp/'+query.module+'/'+query.file;
-	else if ( query.type == 'public' )	file.path = pwd+'/public/uploads/'+query.module+'/'+query.id+'/'+query.file;
-	else if ( query.type == 'private' )	file.path = pwd+'/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
-	
+	if ( query.type == 'tmp' ) {
+		if ( query.statut == 'public' )				file.path = pwd+'/public/data/tmp/'+query.module+'/'+query.id+'/'+query.file;
+		else if ( query.statut == 'private' )		file.path = pwd+'/data/tmp/'+query.module+'/'+query.id+'/'+query.file;
+	}
+	else if ( query.type == 'uploaded' ) {
+		if ( query.statut == 'public' )				file.path = pwd+'/public/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
+		else if ( query.statut == 'private' )		file.path = pwd+'/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
+	}
+	console.log(file);
 	param.main.tpl.file = file;
 	
 	if ( fs.existsSync(file.path) ) 	displayFile();

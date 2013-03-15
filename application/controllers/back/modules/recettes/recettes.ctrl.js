@@ -45,7 +45,7 @@ exports.load = function (param, callback) {
 					}
 				},
 				commentaires	: {
-					display			: { list : true, form : false },
+					display			: { list : false, form : true },
 					label 			: 'Commentaires',
 					param			: {
 						type 			: 'textarea'
@@ -112,6 +112,32 @@ exports.load = function (param, callback) {
 							statut		: 'pub',
 							media		: 'img'
 						}
+					}
+				}
+			}
+		},
+		
+		
+		
+		views	: {
+			order	: ['entree', 'plat', 'dessert'],
+			all		: {
+				'entree'	: {
+					title		: 'Entr&eacute;es',
+					condition	: {
+							type	: 'entree'
+					}
+				},
+				'plat'	: {
+					title		: 'Plats',
+					condition	: {
+							type	: 'plat'
+					}
+				},
+				'dessert'	: {
+					title		: 'Desserts',
+					condition	: {
+							type	: 'desser'
 					}
 				}
 			}

@@ -35,7 +35,7 @@ var users = lib.users.Users();
 
 var packs = {
 	loaded		: false,
-	selected	: 'emprunts',
+	selected	: 'recettes',
 	all			: {
 		'recettes' 		: {
 			title		: 'Recettes',
@@ -305,8 +305,15 @@ exports.sockets = function (param) {
 						if ( !_.isArray(field.param.file.ext) )	field.param.file.ext = [field.param.file.ext];
 					}
 					
-					
 					fields[f] = field;
+				}
+				
+				if ( thisModule.views ) {
+					for ( v in thisModule.views.all ) {
+						var view = thisModule.views.all[v];
+						
+						if ( !view.order ) view.order = thisModule.fields.order
+					}
 				}
 				
 				return fields;
@@ -877,7 +884,7 @@ exports.sockets = function (param) {
 					if ( !err && stats.isDirectory() ) {
 						// Le répertoire existe
 						fs.rmdirfSync(dir);
-						console.log('Répertoire '+dir+' supprimé');
+						console.log('Directory '+dir+' removed');
 					}
 				});
 			}
@@ -889,11 +896,11 @@ exports.sockets = function (param) {
 			var directories = {
 				tmp			: {
 					priv		: pwd+'/data/tmp/',
-					pub		: pwd+'/public/tmp/'
+					pub		: pwd+'/public/data/tmp/'
 				},
 				uploads	: {
 					priv		: pwd+'/data/uploads/',
-					pub			: pwd+'/public/uploads/'
+					pub			: pwd+'/public/data/uploads/'
 				}
 			}
 
