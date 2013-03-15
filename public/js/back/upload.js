@@ -429,6 +429,7 @@ function Upload (file, param) {
 			var type = 'tmp';
 		}
 		
+		
 		url = '/download/?file='+file+'&id='+id+'&type='+type+'&module='+module+'&statut='+statut;
 		// alert(url);
 		window.location = url;

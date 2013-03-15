@@ -118,7 +118,6 @@ exports.load = function (param, callback) {
 		},
 		
 		
-		
 		views	: {
 			order	: ['entree', 'plat', 'dessert'],
 			all		: {
