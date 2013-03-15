@@ -741,10 +741,10 @@ exports.sockets = function (param) {
 					
 					fs.close(files[name].handler, function (err) {
 						if (err) console.log(err);
-					});
 					
-					socket.emit('upload-ended', {
-						name	: name
+						socket.emit('upload-ended', {
+							name	: name
+						});
 					});
 				});
 			}
