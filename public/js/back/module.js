@@ -472,7 +472,7 @@ function Page () {
 			code = e.keyCode ? e.keyCode : e.which;
 			
 			if ( code == 27 ) {
-				self.exitForm();
+				// self.exitForm();
 			}
 		});
 		// Clique sur cancel
