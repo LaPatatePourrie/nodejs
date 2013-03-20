@@ -1,0 +1,58 @@
+div.packages
+	- for ( p in packs.all ) {
+		- if ( p == packs.selected )
+			.selected(
+				data-package	= '#{p}'
+			)
+				img.select.default(src='/public/img/icon/arrow_selection.png')
+				img.select.hover(src='/public/img/icon/arrow_selection_hover.png')
+				| #{packs.all[p].title}
+	- }
+	
+	.others
+		- for ( p in packs.all ) {
+			- if ( p != packs.selected )
+				.package(
+					data-package	= '#{p}'
+				)
+					| #{packs.all[p].title}
+		- }
+
+	
+ul.lamd
+	- pack = packs.all[packs.selected]
+	- categories = pack.categories
+	- modules = pack.modules
+	
+	- for ( var c=0; c<categories.order.length; c++ ) {
+		- category = categories.all[categories.order[c]]
+		
+		li.category
+			| #{category.title}
+			
+		- for ( var i=0; i<category.order.length; i++ ) {
+			- module = modules[category.order[i]]
+			
+			- if ( module.auth.main.actions.list )
+				ul(data-module = '#{module.name}')
+					
+					li.module(
+						data-module = '#{module.name}'
+					)
+						| #{module.title}
+						
+					- if ( module.views )
+						- for ( v=0; v<module.views.order.length; v++ ) {
+							- view = module.views.all[module.views.order[v]]
+							
+							- if ( module.auth[module.views.order[v]].actions.list )
+								li.view(
+									data-module  = '#{module.name}'
+									data-view    = '#{module.views.order[v]}'			
+								)
+									img.active(src='/public/img/icon/view.png')
+									img.hover(src='/public/img/icon/view_hover.png')
+									| #{view.title}
+						- }
+		- }
+	- }

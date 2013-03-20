@@ -1,0 +1,9 @@
+ul
+	- var current = ''; if ( pack == 'accueil' ) { current='current' }
+	li(class='#{current}')
+		a(href='/') Accueil
+		
+	- var current = ''; if ( pack == 'jeu' ) { current='current' }
+	li(class='#{current}')
+		a(href='/jeu/tetris') Jeux
+		

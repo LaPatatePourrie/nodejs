@@ -1,0 +1,262 @@
+- fields = module.fields
+- data = module.data
+
+
+.content
+	.header
+		.title
+			- if ( mode == 'add' )
+				img(
+					src		= '/public/img/icon/add.png'
+					class	= '#{mode}'
+				)
+				| Ajout
+			- else if ( mode == 'mod' )
+				img(
+					src		= '/public/img/icon/mod.png'
+					class	= '#{mode}'
+				)
+				| Modification
+		
+		.options
+			.option.cancel
+				img.active(src='/public/img/icon/cancel.png')
+				img.hover(src='/public/img/icon/cancel_hover.png')
+	
+	form#lamd(
+		data-id		= '#{data._id}'
+		data-mode	= '#{mode}'
+		data-module = '#{module.name}'
+	)
+		table
+			
+			- for ( var i=0; i<module.order.length; i++ ) {
+				- f = module.order[i]
+				
+				- if ( auth.fields[f] && fields.all[f].display.form )
+					tr.field(
+						data-field='#{f}'
+						data-active='true'
+					)
+						td.label
+							| #{fields.all[f].label.form}
+							- if ( fields.all[f].constraints && (fields.all[f].constraints.notEmpty || fields.all[f].constraints.longerThan) )
+								| *
+						
+						- param = fields.all[f].param
+						- type = param.type
+						
+						td.value
+							div.container
+								
+								- if ( type == 'input' )
+									- detail = 'text'
+									- placeholder = ''
+									- dflt = ''
+									- if ( param.detail )
+										- detail  = param.detail
+										- if ( detail == 'url' )
+											- dflt = 'http://'
+									- if ( param.placeholder )
+										- placeholder = param.placeholder
+									
+									
+									- if ( param.autocomplete )
+										input.export(
+											type			 = 'hidden'
+											value   		 = '#{data[f]}'
+											name   			 = '#{f}'
+											data-default	 = '#{dflt}'
+										)
+										
+										- if ( param.value.embedded )
+											- val = param.value.values[data[f]] ? param.value.values[data[f]] : data[f]
+										- else
+											- val = data[f]
+										
+										input.field.text(
+											type			 = '#{detail}'
+											value   		 = '#{val}'
+											name   			 = '#{f}'
+											placeholder		 = '#{placeholder}'
+										)
+										div.autocomplete
+											ul
+												- for ( v in param.value.values ) {
+													li(
+														data-value='#{v}'
+														data-txt='#{param.value.values[v]}'
+													)
+														| #{param.value.values[v]}
+												- }
+									
+									- else
+										- val = data[f]
+										- if ( val == '' && param.detail == 'url' )
+											- val = dflt
+										
+										input.field.text.export(
+											data-entersubmit = 'true'
+											type			 = '#{detail}'
+											value   		 = '#{val}'
+											name   			 = '#{f}'
+											placeholder		 = '#{placeholder}'
+											data-default	 = '#{dflt}'
+										)
+								
+								- else if ( type == 'file' )
+									.upload
+										.header
+											.field
+												input(
+													type='file'
+												)
+												.btn
+													img(src='/public/img/icon/drive-upload.png')
+													| Parcourir
+												input.export(type='text')
+											
+											.feedback(data-statut='default')
+										
+										
+										table.uploads
+											tr.tpl.file
+												td.title
+													.thumb
+														a
+															img
+													.name
+														.img
+															img
+														.txt
+														
+												td.progress
+													.bar
+														.percent
+														.inner
+												td.size
+												td.option.del(title='Supprimer ce fichier')
+													img.cancel(src='/public/img/icon/cancel.png')
+													img.del(src='/public/img/icon/del.png')
+												td.option.mod(title='Modifier les informations de ce fichier')
+													img(src='/public/img/icon/mod.png')
+											
+											tr.tpl.form
+												td
+													| Titre du fichier :
+												td
+													input.field(
+														type		= 'text'
+														name 		= 'title'
+														value		= ''
+														placeholder = ''
+													)
+												td
+												td.option.cancel(title='Annuler les modifications')
+													img(src='/public/img/icon/cancel.png')
+												td.option.save(title='Sauvegarder les modifications')
+													img.save(src='/public/img/icon/save.png')
+													
+								
+								- else if ( type == 'textarea' )
+									textarea.field.export(
+										name   	 = '#{f}'
+									) #{data[f]}
+									
+								- else if ( type == 'passwd' )
+									input.field.text.export(
+										type			 = 'password'
+										value   		 = ''
+										name   			 = '#{f}'
+									)
+									div.changePasswd(data-action="change")
+										| Changer le mot de passe
+									div.changePasswd(data-action="cancel")
+										img(src="/public/img/icon/cancel.png")
+										| Annuler
+								
+								- else if ( type == 'radio' || type == 'checkbox' || type == 'select' )
+									- val = data[f]
+									- if ( (val == '' || !val) && param.dflt )
+										- val = param.dflt
+									
+									input.export(
+										type			 = 'hidden'
+										name   			 = '#{f}'
+										value   		 = '#{val}'
+									)
+									
+									- if ( type == 'select' )
+										select.field(
+											name   			 = '#{f}'
+											type   			 = 'select'
+										)
+											- for ( val in param.value.values ) {
+												- checked = 'false'
+												- for ( k=0; k<data[f].length; k++ ) {
+													-if ( val == data[f][k] )
+														- checked = 'true'
+												- }
+												
+												option.case(
+													value   		 = '#{val}'
+													data-checked	 = '#{checked}'
+												)
+													| #{param.value.values[val]}
+											- }
+										
+									- else 
+										div.case.field(class='#{type}')
+									
+											- for ( v in param.value.values ) {
+												- val = v
+												- label = param.value.values[val]
+												
+													- checked = 'false'
+													
+													- if ( type == 'radio' )
+														- datas = [];
+														- if ( data[f] )
+															- datas = [data[f]]
+														
+													- else if ( type == 'checkbox' )
+														- datas = data[f];
+													
+													- if ( datas.length > 0 )
+														- for ( k=0; k<datas.length; k++ ) {
+															-if ( val == datas[k] )
+																- checked = 'true'
+														- }
+													- else 
+														- if ( param.dflt )
+															- for ( k=0; k<param.dflt.length; k++ ) {
+																- if ( val == param.dflt[k] )
+																	- checked = 'true'
+															- }
+													
+													label(data-checked = '#{checked}')
+														input.case(
+															type			 = '#{type}'
+															value   		 = '#{val}'
+															name   			 = '#{f}'
+															data-checked	 = '#{checked}'
+															data-label		 = '#{label}'
+														)
+														| #{label}
+											- }
+									
+								
+								div.feedback
+									- if ( fields.all[f].details )
+										img.help(
+											src='/public/img/icon/help.png'
+											alt=''
+										)
+									div.feed
+			- } 
+		.bottom
+			.btn(data-submit='lamd') 
+				- if ( mode == 'add' )
+					| Ajouter
+				- else if ( mode == 'mod' )
+					| Modifier

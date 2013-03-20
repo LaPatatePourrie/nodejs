@@ -1,0 +1,115 @@
+body
+	#tetris
+		h2.game
+			img(src='#{main.tpl.path}/img/titre.png')
+		#left
+			#play.bouton
+				img(src='#{main.tpl.path}/img/play.png')
+				p
+					span Jouer
+			#stop.bouton
+				img(src='#{main.tpl.path}/img/stop.png')
+				p
+					span Arrêter
+			#nextBloc
+				div Prochaine pièce
+				table
+					- for (var i=0; i<5; i++ ) {
+						tr
+							- for (var j=0; j<7; j++ ) {
+								td
+							- }
+					- }
+					
+			#sidebar
+				.infos
+					#level.niveau
+						| Niveau
+						span
+					#nextLevel.prochain.gris
+						| Prochain niveau :
+						span
+						| &nbsp;points
+					#nbPoints.point_current
+						span
+						| &nbsp;points
+					#nbPointsPlus.point_gagne
+						| (+
+						span
+						| &nbsp;points)
+				#bonus
+					#bonus_encours
+						span
+					#bonus0
+					p
+						| Vous avez
+						span 0
+							| bonus
+					#utiliser_bonus.bouton
+						| Utiliser un
+						span Bonus
+					#bonus1
+						p.titre
+							| Vos bonus
+						ul
+
+		#main
+			#feedback
+				.feedback.mode
+					p.titre
+						| Sélectionnez le mode de jeu
+						.accordeon(onclick='Tet.mode = \'classic\'; Tet.start();')
+							p.choix
+								a(href='#')
+									| Classique
+							p
+								| Le jeu classique Tetris que tout le monde connaît.
+						.accordeon(onclick='Tet.mode = \'bonus\'; Tet.start();')
+							p.choix
+								a(href='#')
+									| Bonus
+							p
+								| 5 nouvelles pièces à découvrir et des bonus à débloquer au fil du jeu !
+				.feedback.gameover
+					p.titre
+						| Game over
+					p.score
+						| Votre score :
+						span
+						| points (Niveau
+						span
+						| )
+				.feedback.regles
+					p.titre
+						| Règles du jeu
+					p
+						| Utilisez les touches de votre clavier pour jouer.
+						
+				.feedback.bonus
+					p.titre
+						| Bonus disponibles
+					#bonus_dispo
+						ul
+						
+				.feedback.choix_piece
+					p.titre
+						| Choisissez votre pièce
+					#pieces_dispo
+						ul
+							li.accordeon(onclick='Tet.Piece.choose(this);Tet.useBonus(this, true);', title='choix')
+								a(href='#', title='17') Barre de 6 blocs
+							li.accordeon(onclick='Tet.Piece.choose(this);Tet.useBonus(this, true);', title='choix')
+								a(href='#', title='0') Barre de 4 blocs
+							li.accordeon(onclick='Tet.Piece.choose(this);Tet.useBonus(this, true);', title='choix')
+								a(href='#', title='13') Bloc unique
+				
+				a.close(href='#', onclick='return false') Fermer
+			
+			
+			table
+				- for (var i=0; i<20; i++ ) {
+					tr
+						- for (var j=0; j<10; j++ ) {
+							td
+						- }
+				- }
