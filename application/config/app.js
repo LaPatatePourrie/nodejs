@@ -9,7 +9,7 @@ exports.load = function (config) {
 	}
 
 	app.configure(function() {
-		app.set('views', pwd+'/application/bundles/bundle/views');
+		app.set('views', pwd+'/application/src/bundle/views');
 		app.set('view engine', 'jade');
 		app.set('view options', { layout : false });
 		app.use(express.bodyParser());

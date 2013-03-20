@@ -1,5 +1,5 @@
 exports.load = function (app, io) {
-	var mainCtrl = require(pwd+'/application/bundles/main.ctrl');
+	var mainCtrl = require(pwd+'/application/src/main.ctrl');
 	
 	var param = {
 		'app'		: app,
