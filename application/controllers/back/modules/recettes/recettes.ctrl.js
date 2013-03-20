@@ -2,18 +2,18 @@ this.statut = 4;
 
 exports.load = function (param, callback) {
 	var module = {
-		name 			: 'recettes',
-		title 			: 'Recettes',
-		table 			: 'recettes',
+		name 		: 'recettes',
+		title 		: 'Recettes',
+		table 		: 'recettes',
 		
-		orderby 		: {
-				field 		: 'titre',
-				asc			: 1
+		orderby 	: {
+				field 	: 'titre',
+				asc		: 1
 		},
 		
 		
-		fields 		 	: {
-			order		: ['titre', 'ingredients', 'type', 'img', 'lien', 'commentaires', 'note'],
+		fields 		 : {
+			order		: ['titre', 'type', 'ingredients', 'preparation', 'img', 'note', 'commentaires', 'lien'],
 			all			: {
 				titre		: {
 					label 		: 'Titre',
@@ -36,12 +36,20 @@ exports.load = function (param, callback) {
 					}
 				},
 				ingredients		: {
+					display			: { list : false, form : true },
 					label 			: 'Ingr&eacute;dients',
 					param			: {
 						type 			: 'textarea'
 					},
 					constraints 	 : {
 						notEmpty		: true
+					}
+				},
+				preparation	: {
+					display			: { list : false, form : true },
+					label 			: 'Pr&eacute;paration',
+					param			: {
+						type 			: 'textarea'
 					}
 				},
 				commentaires	: {
@@ -90,7 +98,7 @@ exports.load = function (param, callback) {
 							values			: {
 								'entree'		: 'Entr&eacute;e',
 								'plat'			: 'Plat',
-								'desser'		: 'Dessert'
+								'dessert'		: 'Dessert'
 							},
 							dflt		: 'plat'
 						}
@@ -105,7 +113,7 @@ exports.load = function (param, callback) {
 						type 		: 'file',
 						file		: {
 							ext			: [
-								'jpg', 'png', 'gif', 'bmp'
+								'jpg', 'jpeg', 'png', 'gif', 'bmp'
 							],
 							max			: 5,
 							maxSize		: 10000000,
@@ -136,7 +144,7 @@ exports.load = function (param, callback) {
 				'dessert'	: {
 					title		: 'Desserts',
 					condition	: {
-							type	: 'desser'
+							type	: 'dessert'
 					}
 				}
 			}

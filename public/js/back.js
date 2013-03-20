@@ -123,6 +123,7 @@ $(document).ready(function () {
 		$menu.find('li.view.current').removeClass('current');
 		$(this).addClass('current');
 		
+		if ( !thisPage.args.list ) thisPage.args.list = {};
 		thisPage.args.list.page = 1;
 		thisPage.changeView($(this).attr('data-view'));
 	});
@@ -138,24 +139,27 @@ $(document).ready(function () {
 	
 	// Add - Mod - Del - Options
 	$module.find('table.main td.option.mod').live('click', function () {
-		thisPage.load({
+		thisPage.args = {
 			module		: thisPage.Module.name,
 			action		: 'form',
 			form		: { mod	: $(this).parent().attr('data-id') }
-		});
+		};
+		thisPage.router();
 	});
 	$module.find('.header .option.add').live('click', function () {
-		thisPage.load({
+		thisPage.args = {
 			module		: thisPage.Module.name,
 			action		: 'form',
 			form		: { add	: true }
-		});
+		};
+		thisPage.router();
 	});
 	$module.find('.header .option.opt').live('click', function () {
-		thisPage.load({
+		thisPage.args = {
 			module		: thisPage.Module.name,
 			action		: 'options'
-		});
+		};
+		thisPage.router();
 	});
 	
 	

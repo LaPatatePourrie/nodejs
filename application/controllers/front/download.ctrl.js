@@ -26,12 +26,12 @@ exports.load = function (param, callback) {
 	}
 	
 	if ( query.type == 'tmp' ) {
-		if ( query.statut == 'public' )				file.path = pwd+'/public/data/tmp/'+query.module+'/'+query.id+'/'+query.file;
-		else if ( query.statut == 'private' )		file.path = pwd+'/data/tmp/'+query.module+'/'+query.id+'/'+query.file;
+		if ( query.statut == 'pub' )				file.path = pwd+'/public/data/tmp/'+query.module+'/'+query.id+'/'+query.file;
+		else if ( query.statut == 'priv' )		file.path = pwd+'/data/tmp/'+query.module+'/'+query.id+'/'+query.file;
 	}
 	else if ( query.type == 'uploaded' ) {
-		if ( query.statut == 'public' )				file.path = pwd+'/public/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
-		else if ( query.statut == 'private' )		file.path = pwd+'/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
+		if ( query.statut == 'pub' )				file.path = pwd+'/public/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
+		else if ( query.statut == 'priv' )		file.path = pwd+'/data/uploads/'+query.module+'/'+query.id+'/'+query.file;
 	}
 	console.log(file);
 	param.main.tpl.file = file;

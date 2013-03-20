@@ -37,7 +37,7 @@ var packs = {
 	loaded		: false,
 	selected	: 'recettes',
 	all			: {
-		'recettes' 		: {
+		'recettes' 	: {
 			title		: 'Recettes',
 			categories  : {
 				order		: ['recettes'],
@@ -48,6 +48,32 @@ var packs = {
 							'recettes'
 						]
 					},
+				}
+			}
+		},
+		'private'	: {
+			title		: 'Section private',
+			categories  : {
+				order		: ['private'],
+				all			: {
+					'private'	: {
+						title		: 'Section private',
+						order		: [
+							'private'
+						]
+					},
+				}
+			}
+		},
+		'pense-betes'	: {
+			title		: 'Pense-b&ecirc;tes',
+			categories  : {
+				order		: ['pense-betes'],
+				all			: {
+					'pense-betes'	: {
+						title		: 'Pense-b&ecirc;tes',
+						order		: ['licence', 'developpement', 'auto-entrepreneur', 'papiers', 'divers'],
+					}
 				}
 			}
 		},
@@ -302,7 +328,7 @@ exports.sockets = function (param) {
 						if ( !field.param.file.maxSize ) 		field.param.file.maxSize = 1000000
 						if ( !field.param.file.statut ) 		field.param.file.statut = 'priv'
 						if ( !field.param.file.max ) 			field.param.file.max = 10
-						if ( !_.isArray(field.param.file.ext) )	field.param.file.ext = [field.param.file.ext];
+						if ( field.param.file.ext && !_.isArray(field.param.file.ext) )	field.param.file.ext = [field.param.file.ext];
 					}
 					
 					fields[f] = field;
@@ -473,6 +499,8 @@ exports.sockets = function (param) {
 				thisModule.form = {id : param.id};
 				
 				tpl.mode = 'mod';
+				console.log('getElem');
+
 				model.getElem({id : param.id, table : thisModule.table}, function (data) {
 					var module = tpl.module;
 					module.data = manageOutputData('mod', data);

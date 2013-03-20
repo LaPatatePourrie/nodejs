@@ -419,7 +419,6 @@ function Upload (file, param) {
 		var module = this.getModule();
 		var file = this.file.name;
 		var statut = this.param.statut;
-		if (statut == 'pub') statut = 'public';
 		
 		if ( this.getStatut() == 'previously' ){
 			var id = $('form#lamd').attr('data-id');

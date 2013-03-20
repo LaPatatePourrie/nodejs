@@ -153,6 +153,7 @@ function Page () {
 					flag	: 'error',
 					type	: 'nonAuthorized'
 				}).displayPostit();
+				self.stopLoading();
 				return;
 			}
 			
@@ -184,10 +185,10 @@ function Page () {
 		var self = this;
 		var args = this.args.form;
 		
-		if ( mode == 'mod' ) 		id = args.mod;
-		else if ( mode == 'add' ) 	id = false;
+		if ( mode == 'mod' ) 		param = args.mod;
+		else if ( mode == 'add' ) 	param = false;
 		
-		this.Module.form(id, function (err, tpl) {
+		this.Module.form(param, function (err, tpl) {
 			if (err) {
 				self.feedback({
 					flag	: 'error',
@@ -1144,6 +1145,7 @@ function Field(name) {
 		$container.append('<div class="switcher widget"></div>');
 		
 		var $switcher = this.elem.$td.find('.switcher');
+
 		$field.find('input').each(function () {
 			$this = $(this);
 			$switcher.append(

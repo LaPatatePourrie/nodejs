@@ -55,7 +55,6 @@
 table.main
 	tr.title(
 			data-checked	= 'false'
-			title			= '#{fields.all[f].label.list}'
 		)
 		- if ( module.actions.del && auth[view].actions.del )
 			td.check
@@ -111,7 +110,7 @@ table.main
 					class='#{current}'
 					data-page='#{page}'
 				)
-					#{page}
+					| #{page}
 			- }
 		
 		- if ( module.page != 'all' )

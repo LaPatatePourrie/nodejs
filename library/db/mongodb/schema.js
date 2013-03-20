@@ -24,6 +24,7 @@ exports.load = function (mongoose) {
 				lien			: String,
 				ingredients		: String,
 				commentaires	: String,
+				preparation		: String,
 				note			: Number,
 				img				: [File]
 			}),
@@ -87,6 +88,50 @@ exports.load = function (mongoose) {
 				dateRetour	: Date,
 				rendu		: Number,
 				urgence		: Number,
+			}),
+
+
+			// Pense-bêtes
+			licence : new mongoose.Schema({
+				titre		: String,
+				description	: String,
+				fichiers	: [File],
+				date		: Date,
+				urgence		: Number,
+			}),
+			autoentrepreneur : new mongoose.Schema({
+				titre		: String,
+				description	: String,
+				fichiers	: [File],
+				date		: Date,
+				urgence		: Number,
+			}),
+			divers : new mongoose.Schema({
+				titre		: String,
+				description	: String,
+				fichiers	: [File],
+				date		: Date,
+				urgence		: Number,
+			}),
+			papiers : new mongoose.Schema({
+				titre		: String,
+				description	: String,
+				fichiers	: [File],
+				date		: Date,
+				urgence		: Number,
+			}),
+			developpement : new mongoose.Schema({
+				titre		: String,
+				description	: String,
+				fichiers	: [File],
+				date		: Date,
+				urgence		: Number,
+			}),
+
+
+			//Private
+			priv : new mongoose.Schema({
+				titre		: String
 			})
 		};
 	
