@@ -1,11 +1,11 @@
 global.pwd = __dirname;
 
 // Globals
-var loader = require('./library/Loader.js').loadGlobals();
+var loader = require('./application/library/Loader.js').loadGlobals();
 
 // Application
-var config = require('./config/config').values;
-var app = require('./config/app').load(config)
+var config = require('./application/config/config').values;
+var app = require('./application/config/app').load(config)
 var io = require('socket.io').listen(app);
 
 
@@ -16,7 +16,7 @@ console.log("Express server listening on port %d in %s mode", app.address().port
 
 
 // Routes
-require('./config/router').load(app, io);
+require('./application/config/router').load(app, io);
 
 
 process.on('SIGINT', function () {
