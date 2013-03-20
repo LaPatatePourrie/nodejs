@@ -1192,7 +1192,7 @@ function Field(name) {
 	}
 	
 	this.getValue = function () {
-		var value = this.elem.$export.val();
+		var value = this.elem.$export.val().trim();
 		
 		if ( this.param.type == 'checkbox' )  value = value.split(',');
 		

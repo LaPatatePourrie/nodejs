@@ -222,6 +222,7 @@ $(document).ready(function () {
 	$module.find('table.main tr.title td[data-sort]').live('click', function () {
 		var field = $(this).attr('data-sort');
 		var asc = 1;
+		if (!thisPage.args.list) thisPage.args.list = {};
 		if ( !thisPage.args.list.sort || thisPage.args.list.sort.asc == 1 ) {
 			var asc = -1;
 		}
@@ -235,11 +236,13 @@ $(document).ready(function () {
 	// Pagination
 	$('#pagination').find('ul li[data-page]').live('click', function () {
 		var page = $(this).attr('data-page');
+		if (!thisPage.args.list) thisPage.args.list = {};
 		thisPage.args.list.page = page;
 		thisPage.list();
 	});
 	$('#pagination').find('.all').live('click', function () {
 		var page = $(this).attr('data-page');
+		if (!thisPage.args.list) thisPage.args.list = {};
 		thisPage.args.list.page = 'all';
 		thisPage.list();
 	});
