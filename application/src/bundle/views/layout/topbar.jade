@@ -1,0 +1,12 @@
+div.user
+	- if ( user.logged ) {
+		div.login
+			| #{user.login}
+		div.tools
+			ul
+				li
+					a.disconnect(data-href="")
+						| D&eacute;connexion
+	- }
+	
+div.menu!= partial('layout/menu.jade')

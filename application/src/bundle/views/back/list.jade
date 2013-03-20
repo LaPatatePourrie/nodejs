@@ -1,0 +1,124 @@
+- fields = module.fields
+- data = module.data
+- user = module.user
+- auth = module.auth
+- view = module.view
+
+.header
+	.bloc.title.left
+		- if ( module.view && module.view != 'main' )
+			| #{module.views.all[module.view].title}
+		- else
+			| #{module.title}
+	
+	.bloc.options.right
+		.option.opt(
+			data-active			= 'true'
+		) 
+			img.active(src='/public/img/icon/options.png')
+			img.hover(src='/public/img/icon/options_hover.png')
+			| Options
+			
+		- if ( module.actions.add && auth[view].actions.add )
+			.option.add(
+				data-active		= 'true'
+			) 
+				img.active(src='/public/img/icon/add.png')
+				img.hover(src='/public/img/icon/add_on.png')
+				| Ajouter
+				
+		- if ( module.actions.del && auth[view].actions.del )
+			.option.del(
+				data-confirmdel		= 'Voulez-vous vraiment supprimer cet &eacute;l&eacute;ment ?'
+				data-confirm		= 'true'
+				data-active			= 'false'
+			) 
+				img.active(src='/public/img/icon/del.png')
+				img.inactive(src='/public/img/icon/del_inactive.png')
+				img.hover(src='/public/img/icon/del_hover.png')
+				| &nbsp;
+	
+			
+	.bloc.search.middle
+		.elements
+			input(
+				type	= 'text'
+				value	= '#{module.search.keywords}'
+			)
+			div.btn
+				img(src='/public/img/icon/loupe.png')
+			div.loader
+				img(src='/public/img/ajax-loader.gif')
+
+
+
+table.main
+	tr.title(
+			data-checked	= 'false'
+		)
+		- if ( module.actions.del && auth[view].actions.del )
+			td.check
+				img.on(src	= '/public/img/icon/checkbox_on.png')
+				img.off(src	= '/public/img/icon/checkbox_off.png')
+			
+		- for ( var i=0; i<module.order.length; i++ ) {
+			- f = module.order[i]
+			
+			- if ( auth.fields[f] )
+				- if ( fields.all[f].display.list )
+					
+					- sorted = 'false'
+					- asc = '0'
+					- if ( f == module.sort.field )
+						- sorted = 'true'
+						- asc = module.sort.asc
+					
+					td(
+						data-field	= '#{f}'
+						data-sort	= '#{f}'
+						data-sorted	= '#{sorted}'
+						data-asc	= '#{asc}'
+					)
+						img.asc(src='/public/img/icon/arrow_bottom.png')
+						img.desc(src='/public/img/icon/arrow_top.png')
+						| #{fields.all[f].label.list}
+		- } 
+		
+		- if ( module.actions.mod && auth[view].actions.mod )
+			td.option.mod
+	
+	
+	- for ( var i=0; i<data.length; i++ ) {
+		
+		tr.value(data-id = '#{data[i]._id}', data-checked = 'false') 
+			include element
+	- }
+
+	
+- npage = module.count / module.elempp
+
+- if ( npage > 1 )
+	div#pagination
+		ul(data-npage='#{npage}')
+			- for ( var i=0; i<npage; i++ ) {
+				- page = i+1
+				- current = ''
+				- if ( module.page == page )
+					current = 'current'
+					
+				li(
+					class='#{current}'
+					data-page='#{page}'
+				)
+					| #{page}
+			- }
+		
+		- if ( module.page != 'all' )
+			.all
+				img(src='/public/img/icon/table.png')
+				.txt
+					| Tout afficher
+			
+			
+			
+			
