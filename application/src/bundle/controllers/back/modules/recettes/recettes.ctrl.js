@@ -84,7 +84,8 @@ exports.load = function (param, callback) {
 								'4'			: '4',
 								'5'			: '5'
 							}
-						}
+						},
+						dflt		: '3'
 					}
 				},
 				type			: {
@@ -99,9 +100,9 @@ exports.load = function (param, callback) {
 								'entree'		: 'Entr&eacute;e',
 								'plat'			: 'Plat',
 								'dessert'		: 'Dessert'
-							},
-							dflt		: 'plat'
-						}
+							}
+						},
+						dflt		: 'plat'
 					},
 					constraints  : {
 						notEmpty	: true

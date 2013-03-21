@@ -177,7 +177,7 @@
 								
 								- else if ( type == 'radio' || type == 'checkbox' || type == 'select' )
 									- val = data[f]
-									- if ( (val == '' || !val) && param.dflt )
+									- if ( param.dflt && (val == '' || !val) )
 										- val = param.dflt
 									
 									input.export(
@@ -204,7 +204,7 @@
 												)
 													| #{param.value.values[val]}
 											- }
-										
+									
 									- else 
 										div.case.field(class='#{type}')
 									
@@ -213,14 +213,12 @@
 												- label = param.value.values[val]
 												
 													- checked = 'false'
+													- datas = data[f];
 													
-													- if ( type == 'radio' )
+													- if ( type == 'radio' || type == 'select' )
 														- datas = [];
 														- if ( data[f] )
 															- datas = [data[f]]
-														
-													- else if ( type == 'checkbox' )
-														- datas = data[f];
 													
 													- if ( datas.length > 0 )
 														- for ( k=0; k<datas.length; k++ ) {

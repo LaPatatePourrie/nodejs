@@ -236,6 +236,9 @@ exports.sockets = function (param) {
 						if ( !field.param.value.dynamic.asc ) 						field.param.value.dynamic.asc = 1
 					}
 					
+					// Default values
+					if (field.param.dflt && !_.isArray(field.param.dflt)) field.param.dflt = [field.param.dflt];
+					
 					// Files
 					if ( field.param.type == 'file' ) {
 						thisModule.uploads = {param : field.param, field : f}

@@ -919,9 +919,11 @@ function Field(name) {
 			$.datepicker.setDefaults(datepickerOptions);
 			this.elem.$field.datepicker();
 		}
+		// Colorpicker
 		else if ( this.param.widget.colorpicker ) {
 			this.elem.$field.minicolors();
 		}
+		// CKeditor
 		else if ( this.param.widget.wysiwyg ) {
 			if ( this.param.widget.wysiwyg == 'ckeditor' ) {
 				CKEDITOR.replace(this.name);
@@ -933,6 +935,7 @@ function Field(name) {
 				});
 			}
 		}
+		// Switcher
 		else if ( this.param.widget.switcher ) {
 			this.setSwitcher();
 		}
