@@ -1,0 +1,6 @@
+*** MongoDB ***
+
+- Export :
+mongodump --db node --out ../dump.json --journal
+- Import :
+mongorestore -d node ../dump.json/node/
