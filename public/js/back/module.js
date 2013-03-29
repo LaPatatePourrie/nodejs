@@ -175,6 +175,7 @@ function Page () {
 			// Focus sur le champs de recherche si post-search
 			if ( self.args.list.keywords ) {
 				$('#module .search input').focusend();
+				self.overline(self.args.list.keywords);
 			}
 		});
 	}
@@ -516,15 +517,15 @@ function Page () {
 			i++;
 		});
 		
-		keywords = keywords.split(' ');
+		keys = keywords.split(' ');
 		var show = [];
 		
 		for ( var i=0; i<elem.length; i++ ) {
 			var ind = 0;
-			for ( var k=0; k<keywords.length; k++ ) {
+			for ( var k=0; k<keys.length; k++ ) {
 				for ( var j=0; j<elem[i].length; j++ ) {
 					if ( elem[i][j] != '' ) {
-						var reg = new RegExp(keywords[k], 'i');
+						var reg = new RegExp(keys[k], 'i');
 						if ( elem[i][j].match(reg) ) {
 							ind++;
 							break;
@@ -542,6 +543,37 @@ function Page () {
 		for ( var i=0; i<show.length; i++ ) {
 			this.elem.$module.find('table.main tr.value:eq('+(show[i])+')').show();
 		}
+
+		this.overline(keywords)
+	}
+
+	this.overline = function (keywords) {
+		elem = $('#module table.main td.value');
+		
+		$('#module table.main td.value .keywordsFound').each(function () {
+			$(this).replaceWith($(this).html());
+		});
+		
+		keywords = keywords.split(' ');
+		
+		elem.each(function () {
+			var value = $(this).html().split(' ');
+			
+			for ( var k=0; k<value.length; k++ ) {
+				for ( var i=0; i<keywords.length; i++ ) {
+					if ( !value[k].match(/span/i) && !value[k].match(/<|>/i) && !value[k].match(/=/i) && !value[k].match(/"/i) ) {
+						var reg = '/('+keywords[i]+')/i';
+						value[k] = value[k].replace(eval(reg), '<span class="keywordsFound">$1</span>');
+					}
+				}
+			}
+			
+			var html = '';
+			for ( var k=0; k<value.length; k++ ) {
+				html += value[k]+' ';
+			}
+			$(this).html(html);
+		});
 	}
 	
 	// Feedbacks
