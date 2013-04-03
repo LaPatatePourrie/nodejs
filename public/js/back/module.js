@@ -490,6 +490,7 @@ function Page () {
 	}
 	
 	this.search = function (keywords) {
+		if (!this.args.list) this.args.list = {}
 		this.args.list.keywords = keywords;
 		var self = this;
 		
