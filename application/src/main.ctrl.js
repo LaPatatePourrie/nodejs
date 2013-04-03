@@ -106,7 +106,6 @@ exports.sockets = function (param) {
 	param.io.set('log level', 1);
 	
 	param.getThisUser = function (socket, libUsers) {
-		console.log(socket.handshake);
 		var user = libUsers.Users().get(socket.handshake.session.user.login);
 
 		if (user)	thisUser = user;
