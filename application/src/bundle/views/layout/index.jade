@@ -18,8 +18,10 @@ html
 		script(type='text/javascript', src='/socket.io/socket.io.js')
 		
 	body(data-office='#{main.template}')
-		div!= partial('layout/'+main.template+'.jade')
-			div#connexion!= partial('modules/connection.jade')
+		div
+			block content
+			div#connexion
+				include ../modules/connection
 		
 		script(type='text/javascript', src='/public/js/library/jquery.js')
 		script(type='text/javascript', src='/public/library/jquery-ui/jquery-ui.js')

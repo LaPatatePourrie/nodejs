@@ -51,7 +51,6 @@ exports.sockets = function (param) {
 	var io = param.io;
 	var model = param.model;
 	
-	param.socketAuthorization();
 	
 	io.of('/module').on('connection', function (socket) {
 		var thisUser = param.getThisUser(socket, lib.users);

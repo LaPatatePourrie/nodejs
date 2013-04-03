@@ -78,7 +78,10 @@ exports.load = function (param) {
 				
 				// Génération de la page
 				// console.log(param);
-				param.res.render('layout/index', param);
+				if ( param.office == 'back' ) 	var path = 'back/'+param.pack;
+				if ( param.office == 'front' )	var path = 'front/'+param.pack;
+				
+				param.res.render(path, param);
 			});
 		}
 	}
@@ -102,24 +105,13 @@ exports.sockets = function (param) {
 	
 	param.io.set('log level', 1);
 	
-	
-	param.socketAuthorization = function () {
-		// Modules
-		param.io.of('/chat').authorization(function (handshakeData, callback) {authorization(param, handshakeData, callback);});
-		// Jeux
-		param.io.of('/jeu-barre').authorization(function (handshakeData, callback) {authorization(param, handshakeData, callback);});
-		// Jeux
-		param.io.of('/module').authorization(function (handshakeData, callback) {authorization(param, handshakeData, callback);});
-	}
-	
 	param.getThisUser = function (socket, libUsers) {
-		var user = libUsers.Users().get(socket.handshake.user.login);
-		if ( user ) {
-			thisUser = user;
-		}
-		else {
-			thisUser = new libUsers.User(socket.handshake.user);
-		}
+		console.log(socket.handshake);
+		var user = libUsers.Users().get(socket.handshake.session.user.login);
+
+		if (user)	thisUser = user;
+		else 		thisUser = new libUsers.User(socket.handshake.session.user);
+		
 		return thisUser;
 	}
 	
@@ -135,30 +127,6 @@ exports.sockets = function (param) {
 
 
 // Objets
-
-
-
-var authorization = function (param, handshakeData, callback) {
-	var parseCookie = require('connect').utils.parseCookie;
-	var cookies = parseCookie(handshakeData.headers.cookie);
-	var sessionID = cookies['connect.sid'];
-	
-	if ( !sessionID ) {
-		callback('No session', false);
-	} 
-	else {
-		handshakeData.sessionID = sessionID;
-		param.app.sessionStore.get(sessionID, function (err, session) {
-			if (!err && session && session.user) {
-				handshakeData.user = session.user;
-				callback(null, true);
-			} 
-			else {
-				callback(err || 'User not authenticated', false);
-			}
-		});
-	}
-}
 
 var getPackage = function (packName, type) {
 	var pack = {};

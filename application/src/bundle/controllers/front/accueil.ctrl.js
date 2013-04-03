@@ -99,7 +99,7 @@ exports.sockets = function (param) {
 	var io = param.io;
 	var model = param.model;
 	
-	param.socketAuthorization();
+	// param.socketAuthorization();
 	
 	
 	var files = {};

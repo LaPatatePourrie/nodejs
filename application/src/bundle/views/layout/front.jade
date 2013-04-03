@@ -1,5 +1,8 @@
 
 div#page.front
-	div#topbar!= partial('layout/topbar.jade')
-	div#chat!= partial('modules/chat.jade')
-	div#corps!= partial('front/'+pack+'.jade')
+	div#topbar
+		include 'layout/topbar.jade'
+	div#chat
+		include 'modules/chat.jade'
+	div#corps
+		include 'front/'+pack+'.jade'

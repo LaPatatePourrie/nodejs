@@ -6,13 +6,26 @@ exports.loadGlobals = function () {
 	global.lib = this.lib();
 
 	// Modules 
-	global.util = require ('util');
-	global.async = require('async');
-	global.fs = require('fs.extra');
-	global.path = require('path');
-	global.mime = require('mime');
-	global.url = require('url');
-	global._ = require('underscore');
+	var modules = [
+		 'http'
+		,'util'
+		,'connect'
+		,'async'
+		,'fs.extra'
+		,'path'
+		,'mime'
+		,'url'
+		,'cookie'
+		,'underscore'
+	]
+	for ( var m=0; m<modules.length; m++ ) {
+		var key = modules[m]
+		var key = key.replace('.extra', '')
+		var key = key.replace('underscore', '_')
+
+		global[key] = require(modules[m]);
+	}
+
 
 	// Prototypes
 	this.prototypes();

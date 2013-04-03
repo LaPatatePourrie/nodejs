@@ -8,7 +8,7 @@ exports.sockets = function (param) {
 	var model = param.model;
 	var io = param.io;
 	
-	param.socketAuthorization();
+	// param.socketAuthorization();
 		
 	var users = lib.users.Users();
 	var messages = new Array();

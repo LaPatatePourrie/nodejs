@@ -17,7 +17,7 @@ exports.sockets = function (param) {
 	var io = param.io;
 	var model = param.model;
 	var socks = {};
-	param.socketAuthorization();
+	// param.socketAuthorization();
 	
 	
 	function Rooms () {
