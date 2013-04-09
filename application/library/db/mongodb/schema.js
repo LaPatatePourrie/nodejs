@@ -26,6 +26,7 @@ exports.load = function (mongoose) {
 				commentaires	: String,
 				preparation		: String,
 				note			: Number,
+				done			: Number,
 				img				: [File]
 			}),
 			

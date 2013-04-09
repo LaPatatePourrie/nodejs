@@ -13,7 +13,7 @@ exports.load = function (param, callback) {
 		
 		
 		fields 		 : {
-			order		: ['titre', 'type', 'ingredients', 'preparation', 'img', 'note', 'commentaires', 'lien'],
+			order		: ['titre', 'type', 'ingredients', 'preparation', 'img', 'note', 'done', 'commentaires', 'lien'],
 			all			: {
 				titre		: {
 					label 		: 'Titre',
@@ -86,6 +86,26 @@ exports.load = function (param, callback) {
 							}
 						},
 						dflt		: '3'
+					}
+				},
+				done	: {
+					label 			: 'D&eacute;j&agrave; fa&icirc;tes',
+					param			: {
+						type 			: 'radio',
+						toggle			: {
+							type		: 'forbidden'
+						},
+						widget		: {
+							switcher	: true
+						},
+						value 		: {
+							fixed 		: true,
+							values		: {
+								'1'			: 'Oui',
+								'0'			: 'Non'
+							}
+						},
+						dflt		: '0'
 					}
 				},
 				type			: {
