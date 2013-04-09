@@ -17,8 +17,8 @@ io.set('authorization', function (data, accept) {
 		return accept('Session cookie required.', false);
 	} 
 
-	data.cookie = require('express/node_modules/cookie').parse(data.headers.cookie);
-	data.cookie = require('express/node_modules/connect/lib/utils').parseSignedCookies(data.cookie, 'secret');
+	data.cookie = cookie.parse(data.headers.cookie);
+	data.cookie = connect.utils.parseSignedCookies(data.cookie, 'secret');
  	
 	/* NOTE: save ourselves a copy of the sessionID. */
 	data.sessionID = data.cookie['express.sid'];
