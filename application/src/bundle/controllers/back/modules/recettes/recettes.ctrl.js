@@ -119,7 +119,8 @@ exports.load = function (param, callback) {
 							values			: {
 								'entree'		: 'Entr&eacute;e',
 								'plat'			: 'Plat',
-								'dessert'		: 'Dessert'
+								'dessert'		: 'Dessert',
+								'accompagnement': 'accompagnement'
 							}
 						},
 						dflt		: 'plat'
